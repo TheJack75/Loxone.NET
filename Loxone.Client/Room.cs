@@ -15,13 +15,13 @@ namespace Loxone.Client
 
     public sealed class Room : IEquatable<Room>
     {
-        private Transport.Room _innerRoom;
+        private Transport.RoomDTO _innerRoom;
 
         public Uuid Uuid => _innerRoom.Uuid;
 
         public string Name => _innerRoom.Name;
 
-        internal Room(Transport.Room room)
+        internal Room(Transport.RoomDTO room)
         {
             Contract.Requires(room != null);
             this._innerRoom = room;

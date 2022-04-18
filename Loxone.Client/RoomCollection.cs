@@ -16,9 +16,9 @@ namespace Loxone.Client
 
     public sealed class RoomCollection : IReadOnlyCollection<Room>
     {
-        private readonly IDictionary<string, Transport.Room> _innerRooms;
+        private readonly IDictionary<string, Transport.RoomDTO> _innerRooms;
 
-        internal RoomCollection(IDictionary<string, Transport.Room> innerRooms)
+        internal RoomCollection(IDictionary<string, Transport.RoomDTO> innerRooms)
         {
             Contract.Requires(innerRooms != null);
             this._innerRooms = innerRooms;

@@ -12,6 +12,7 @@ namespace Loxone.Client.Samples.Console
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -60,6 +61,10 @@ namespace Loxone.Client.Samples.Console
                 Console.WriteLine($"  Culture: {structureFile.Localization.Culture}");
                 Console.WriteLine($"  Last modified: {structureFile.LastModified}");
                 Console.WriteLine($"  Miniserver type: {structureFile.MiniserverInfo.MiniserverType}");
+
+                //Console.WriteLine($"Control types:");
+                //var groupedControls = structureFile.Controls.GroupBy(c => c.ControlType).Distinct().Select(c => c.Key);
+                //Console.WriteLine(String.Join("\r\n", groupedControls));
 
                 connection.ValueStateChanged += (sender, e) =>
                 {

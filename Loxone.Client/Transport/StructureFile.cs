@@ -22,12 +22,12 @@ namespace Loxone.Client.Transport
         [JsonPropertyName("msInfo")]
         public MiniserverInfo MiniserverInfo { get; set; }
 
-        public IDictionary<string, Room> Rooms { get; set; }
+        public IDictionary<string, RoomDTO> Rooms { get; set; }
 
         [JsonPropertyName("cats")]
-        public IDictionary<string, Category> Categories { get; set; }
+        public IDictionary<string, CategoryDTO> Categories { get; set; }
 
-        public IDictionary<string, Control> Controls { get; set; }
+        public IDictionary<string, ControlDTO> Controls { get; set; }
 
         [JsonExtensionData]
         public IDictionary<string, JsonElement> ExtensionData { get; set; }

@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="CategoryCollection.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -16,9 +16,9 @@ namespace Loxone.Client
 
     public sealed class CategoryCollection : IReadOnlyCollection<Category>
     {
-        private readonly IDictionary<string, Transport.Category> _innerCategories;
+        private readonly IDictionary<string, Transport.CategoryDTO> _innerCategories;
 
-        internal CategoryCollection(IDictionary<string, Transport.Category> innerCategories)
+        internal CategoryCollection(IDictionary<string, Transport.CategoryDTO> innerCategories)
         {
             Contract.Requires(innerCategories != null);
             this._innerCategories = innerCategories;

@@ -14,7 +14,7 @@ namespace Loxone.Client.Transport
     using System.Text.Json;
     using System.Text.Json.Serialization;
 
-    internal sealed class Control
+    public sealed class ControlDTO
     {
         [JsonPropertyName("uuidAction")]
         public Uuid Uuid { get; set; }
@@ -34,6 +34,15 @@ namespace Loxone.Client.Transport
 
         [JsonPropertyName("cat")]
         public Uuid? Category { get; set; }
+
+        [JsonPropertyName("details")]
+        public Dictionary<string, object> Details { get; set; } = new Dictionary<string, object>();
+
+        [JsonPropertyName("states")]
+        public Dictionary<string, string> States { get; set; } = new Dictionary<string, string>();
+
+        [JsonPropertyName("subControls")]
+        public Dictionary<string, ControlDTO> SubControls { get; set; } = new Dictionary<string, ControlDTO>();
 
         [JsonExtensionData]
         public IDictionary<string, JsonElement> ExtensionData { get; set; }

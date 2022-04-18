@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="Uuid.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -25,7 +25,10 @@ namespace Loxone.Client
     /// </devdoc>
     public struct Uuid : IComparable, IComparable<Uuid>, IEquatable<Uuid>
     {
+        private const char UUID_SEPARATOR = '/';
+
         private readonly Guid _uuid;
+        private readonly string _subId;
 
         public Uuid(ArraySegment<byte> bytes)
         {
@@ -45,17 +48,26 @@ namespace Loxone.Client
                 b[13],
                 b[14],
                 b[15]);
+
+            _subId = null;
         }
 
         public Uuid(string s)
         {
-            _uuid = ParseInternal(s);
+            (_uuid, _subId) = ParseInternal(s);
         }
 
-        private static Guid ParseInternal(string s)
+        private static (Guid guid, string subId) ParseInternal(string s)
         {
-            s = s.Replace("-", String.Empty);
-            return Guid.ParseExact(s, "N");
+            var splitted = s.Split(UUID_SEPARATOR);
+            string guid = splitted[0];
+            string subId = null;
+            if(splitted.Length == 2)
+            {
+                subId = splitted[1];
+            }
+            guid = guid.Replace("-", String.Empty);
+            return (Guid.ParseExact(guid, "N"), subId);
         }
 
         public static Uuid Parse(string s)
@@ -68,7 +80,11 @@ namespace Loxone.Client
             // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
             // ->
             // xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxxxxxx
-            return _uuid.ToString("D").Remove(23, 1);
+            var uuidText = _uuid.ToString("D").Remove(23, 1);
+            if (_subId != null)
+                return $"{uuidText}{UUID_SEPARATOR}{_subId}";
+
+            return uuidText;
         }
 
         public int CompareTo(object obj)

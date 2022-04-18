@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="Category.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -16,7 +16,7 @@ namespace Loxone.Client
 
     public sealed class Category : IEquatable<Category>
     {
-        private Transport.Category _innerCategory;
+        private Transport.CategoryDTO _innerCategory;
 
         public Uuid Uuid => _innerCategory.Uuid;
 
@@ -25,7 +25,7 @@ namespace Loxone.Client
         // There should be support for Color type in .NET Standard 1.7
         public Color Color => _innerCategory.Color;
 
-        internal Category(Transport.Category category)
+        internal Category(Transport.CategoryDTO category)
         {
             Contract.Requires(category != null);
             this._innerCategory = category;

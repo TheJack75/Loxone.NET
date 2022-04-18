@@ -71,6 +71,21 @@ namespace Loxone.Client
             }
         }
 
+        private ControlsCollection _controls;
+
+        public ControlsCollection Controls
+        {
+            get
+            {
+                if(_controls == null)
+                {
+                    _controls = new ControlsCollection(_innerFile.Controls, new ControlFactory(this));
+                }
+
+                return _controls;
+            }
+        }
+
         private StructureFile(Transport.StructureFile innerFile)
         {
             Contract.Requires(innerFile != null);

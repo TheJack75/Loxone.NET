@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------
-// <copyright file="Category.cs">
+// <copyright file="Room.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
 // <license>
@@ -10,12 +10,11 @@
 
 namespace Loxone.Client.Transport
 {
-    using System.Drawing;
     using System.Collections.Generic;
     using System.Text.Json;
     using System.Text.Json.Serialization;
 
-    internal sealed class Category
+    internal sealed class RoomDTO
     {
         public Uuid Uuid { get; set; }
 
@@ -24,8 +23,6 @@ namespace Loxone.Client.Transport
         public bool IsFavorite { get; set; }
 
         public int DefaultRating { get; set; }
-
-        public Color Color { get; set; }
 
         [JsonExtensionData]
         public IDictionary<string, JsonElement> ExtensionData { get; set; }
