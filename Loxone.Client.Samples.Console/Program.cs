@@ -15,11 +15,12 @@ namespace Loxone.Client.Samples.Console
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Loxone.Client.Commands;
 
     internal class Program
     {
         private const string _miniserverAddress = "http://testminiserver.loxone.com:7778/";
-
+        
         private async Task RunAsync(CancellationToken cancellationToken)
         {
             using (var connection = new MiniserverConnection(new Uri(_miniserverAddress)))
@@ -70,6 +71,9 @@ namespace Loxone.Client.Samples.Console
                 {
                     foreach (var change in e.ValueStates)
                     {
+                        var control = structureFile.Controls.FindByStateUuid(change.Control);
+                        if (control != null)
+                            control.UpdateStateValue(change);
                         Console.WriteLine(change);
                     }
                 };
@@ -85,9 +89,20 @@ namespace Loxone.Client.Samples.Console
                 Console.WriteLine("Enabling status updates...");
                 await connection.EnableStatusUpdatesAsync(cancellationToken);
 
-                Console.WriteLine("Status updates enabled, now receiving updates. Press Ctrl+C to quit.");
+                /*Console.WriteLine("Press enter to give a pulse to the bathroom light");
+                Console.ReadLine();
 
+                Console.WriteLine("Switching on/off Bathroom light");
+                var bathroomLightController = structureFile.Controls.Single(c => c.Name.Contains("Bathroom") && c is LightControllerV2Control) as LightControllerV2Control;
+                var invoker = new CommandInvoker();
+                var bathroomSwitch = bathroomLightController.SubControls.FirstOrDefault(c => c is SwitchControl) as SwitchControl;
+                var command = new SwitchPulseCommand(bathroomSwitch, connection);
+                invoker.Command = command;
+                invoker.Execute();
+                */
+                Console.WriteLine("Status updates enabled, now receiving updates. Press Ctrl+C to quit.");
                 await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken).ConfigureAwait(false);
+                //_closingEvent.Wait();
             }
         }
 
@@ -99,6 +114,8 @@ namespace Loxone.Client.Samples.Console
             {
                 Console.WriteLine("Aborted.");
                 cancellationTokenSource.Cancel();
+                //_closingEvent.Set();
+                //_closingEvent.Dispose();
             };
 
             try

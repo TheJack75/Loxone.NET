@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="StructureFile.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -10,6 +10,8 @@
 
 namespace Loxone.Client
 {
+    using System.Collections.Generic;
+
     public interface ILoxoneControl
     {
         Uuid Uuid { get; }
@@ -18,5 +20,8 @@ namespace Loxone.Client
         Uuid? RoomId { get; }
         Uuid? CategoryId { get; }
         string ControlType { get; }
+        IReadOnlyDictionary<string, Uuid> States { get; }
+        ControlsCollection SubControls { get; }
+        void UpdateStateValue(ValueState change);
     }
 }

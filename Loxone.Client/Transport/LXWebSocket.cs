@@ -68,10 +68,10 @@ namespace Loxone.Client.Transport
             _receiveLoopCancellation = new CancellationTokenSource();
 
             // Fire and forget, no await here.
-            ReceiveLoopAsync();
+            Task.Run(() => ReceiveLoopAsync());
         }
 
-        private async void ReceiveLoopAsync()
+        private async Task ReceiveLoopAsync()
         {
             Contract.Requires(_receiveLoopCancellation != null, "Receive loop is not running");
 

@@ -15,13 +15,6 @@ namespace Loxone.Client
 
     public class ControlFactory : IControlFactory
     {
-        public StructureFile StructureFile { get; }
-
-        public ControlFactory(StructureFile structureFile)
-        {
-            StructureFile = structureFile;
-        }
-
         public IReadOnlyDictionary<string, ILoxoneControl> Create(IDictionary<string, ControlDTO> controlDTOs)
         {
             var result = new Dictionary<string, ILoxoneControl>();

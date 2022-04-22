@@ -12,15 +12,39 @@ namespace Loxone.Client
 {
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using Loxone.Client.Transport;
 
     public class ControlsCollection : IReadOnlyCollection<ILoxoneControl>, IEnumerable<ILoxoneControl>
     {
         private readonly IReadOnlyDictionary<string, ILoxoneControl> _controls;
+        private readonly IReadOnlyDictionary<Uuid, ILoxoneControl> _controlByStateUuids;
 
         internal ControlsCollection(IDictionary<string, ControlDTO> controls, IControlFactory controlFactory)
         {
             _controls = controlFactory.Create(controls);
+            var allStates = _controls.Values.ToDictionary(v => v, v => v.States);
+            
+            var controlStates = new Dictionary<Uuid, ILoxoneControl>();
+            foreach (var kvp in allStates)
+            {
+                foreach(var state in kvp.Value)
+                {
+                    controlStates.Add(state.Value, kvp.Key);
+                    
+                }
+
+                foreach (var subControl in kvp.Key.SubControls)
+                {
+                    foreach (var state in subControl.States)
+                    {
+                        if (!controlStates.ContainsKey(state.Value))
+                            controlStates.Add(state.Value, subControl);
+
+                    }
+                }
+            }
+            _controlByStateUuids = controlStates;
         }
 
         public int Count => _controls.Count;
@@ -36,6 +60,12 @@ namespace Loxone.Client
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+
+        public ILoxoneControl FindByStateUuid(Uuid stateUuid)
+        {
+            _controlByStateUuids.TryGetValue(stateUuid, out ILoxoneControl control);
+            return control;
         }
     }
 
@@ -86,6 +116,17 @@ namespace Loxone.Client
         public SwitchControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        
+        public bool IsOn { get {
+                var uuid = States["active"];
+                if (uuid == null)
+                    return false;
+                StateValues.TryGetValue(uuid, out object val);
+                if(val is bool)
+                    return (bool)val;
+
+                return false;
+            } }
     }
     public class LoadManagerControl : ReadOnlyControl
     {

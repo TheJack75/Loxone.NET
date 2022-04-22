@@ -16,6 +16,8 @@ namespace Loxone.Client
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
+    using Loxone.Client.Commands;
+    using Loxone.Client.Transport;
 
     /// <summary>
     /// Encapsulates connection to the Loxone Miniserver.
@@ -237,6 +239,12 @@ namespace Loxone.Client
             CheckBeforeOperation();
             string s = await _webSocket.RequestStringAsync("data/LoxAPP3.json", cancellationToken).ConfigureAwait(false);
             return StructureFile.Parse(s);
+        }
+
+        internal async Task<LXResponse<string>> SendCommand<TCommand>(TCommand command, CancellationToken cancellationToken) where TCommand : CommandBase
+        {
+            var response = await _webSocket.RequestCommandAsync<string>($"jdev/sps/io/{command.GetActionUri()}", _defaultEncryption, cancellationToken).ConfigureAwait(false);
+            return response;
         }
 
         public async Task<DateTime> GetStructureFileLastModifiedDateAsync(CancellationToken cancellationToken)

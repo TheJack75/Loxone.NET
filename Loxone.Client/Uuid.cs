@@ -67,7 +67,15 @@ namespace Loxone.Client
                 subId = splitted[1];
             }
             guid = guid.Replace("-", String.Empty);
-            return (Guid.ParseExact(guid, "N"), subId);
+            try
+            {
+                return (Guid.ParseExact(guid, "N"), subId);
+            }
+            catch(Exception ex)
+            {
+
+            }
+            return (Guid.ParseExact(guid, "S"), subId);
         }
 
         public static Uuid Parse(string s)

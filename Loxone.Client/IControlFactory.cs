@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="StructureFile.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -15,7 +15,6 @@ namespace Loxone.Client
 
     public interface IControlFactory
     {
-        StructureFile StructureFile { get; }
         IReadOnlyDictionary<string, ILoxoneControl> Create(IDictionary<string, ControlDTO> controlDTOs);
         ILoxoneControl Create(ControlDTO controlDTO);
     }
