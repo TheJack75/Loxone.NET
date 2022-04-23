@@ -49,5 +49,10 @@ namespace Loxone.Client
         {
             StateValues[valueState.Control] = valueState.Value;
         }
+
+        public override string ToString()
+        {
+            return $"{ControlType} - {Uuid} - {Name}";
+        }
     }
 }

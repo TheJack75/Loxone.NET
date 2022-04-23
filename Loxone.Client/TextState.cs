@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="TextState.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -12,7 +12,7 @@ namespace Loxone.Client
 {
     using System;
 
-    public class TextState
+    public class TextState : IStateChange
     {
         private readonly Uuid _control;
 

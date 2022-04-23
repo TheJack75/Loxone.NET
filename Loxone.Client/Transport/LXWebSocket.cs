@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------
+ // ----------------------------------------------------------------------
 // <copyright file="LXWebSocket.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -29,8 +29,7 @@ namespace Loxone.Client.Transport
         private LXHttpClient _httpClient;
 
         private readonly IEncryptorProvider _encryptorProvider;
-
-        private readonly IEventListener _eventListener;
+        private readonly ILoxoneStateQueue _stateQueue;
 
         protected internal override LXClient HttpClient
         {
@@ -44,11 +43,11 @@ namespace Loxone.Client.Transport
             }
         }
 
-        public LXWebSocket(Uri baseUri, IEncryptorProvider encryptorProvider, IEventListener eventListener) : base(baseUri)
+        public LXWebSocket(Uri baseUri, IEncryptorProvider encryptorProvider, ILoxoneStateQueue stateQueue) : base(baseUri)
         {
             Contract.Requires(HttpUtils.IsWebSocketUri(baseUri));
-            this._encryptorProvider = encryptorProvider;
-            this._eventListener = eventListener;
+            _encryptorProvider = encryptorProvider;
+            _stateQueue = stateQueue;
         }
 
         protected override async Task OpenInternalAsync(CancellationToken cancellationToken)
@@ -147,7 +146,6 @@ namespace Loxone.Client.Transport
         {
             if (length >= 24)
             {
-                var states = new List<ValueState>(length / 24);
                 var buffer = new ArraySegment<byte>(new byte[24]);
 
                 while (length >= 24)
@@ -155,11 +153,9 @@ namespace Loxone.Client.Transport
                     await ReceiveAtomicAsync(buffer, false, cancellationToken).ConfigureAwait(false);
                     var uuid = new Uuid(new ArraySegment<byte>(buffer.Array, 0, 16));
                     double value = BitConverter.ToDouble(buffer.Array, 16);
-                    states.Add(new ValueState(uuid, value));
+                    _ = _stateQueue.EnqueueAsync(new ValueState(uuid, value));
                     length -= 24;
                 }
-
-                _eventListener.OnValueStateChanged(states);
             }
 
             if (length > 0)
@@ -173,19 +169,16 @@ namespace Loxone.Client.Transport
         {
             if (length >= 36)
             {
-                var states = new List<TextState>();
                 var buffer = new ArraySegment<byte>(new byte[length]);
                 await ReceiveAtomicAsync(buffer, false, cancellationToken).ConfigureAwait(false);
                 int offset = 0;
                 while (length >= 36)
                 {
                     int processed = ParseTextState(buffer.Array, ref offset, out var state);
-                    states.Add(state);
+                    _ = _stateQueue.EnqueueAsync(state);
                     Contract.Assert(processed <= length);
                     length -= processed;
                 }
-
-                _eventListener.OnTextStateChanged(states);
             }
 
             if (length > 0)

@@ -11,101 +11,22 @@
 namespace Loxone.Client.Samples.Console
 {
     using System;
+    using System.Collections;
     using System.IO;
     using System.Linq;
+    using System.Runtime.Serialization;
     using System.Threading;
     using System.Threading.Tasks;
     using Loxone.Client.Commands;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Options;
 
     internal class Program
     {
-        private const string _miniserverAddress = "http://testminiserver.loxone.com:7778/";
+        public static IConfigurationRoot Configuration { get; set; }
         
-        private async Task RunAsync(CancellationToken cancellationToken)
-        {
-            using (var connection = new MiniserverConnection(new Uri(_miniserverAddress)))
-            {
-                // Specify Miniserver username and password.
-                connection.Credentials = new TokenCredential("web", "web", TokenPermission.Web, default, "Loxone.NET Sample Console");
-
-                Console.WriteLine($"Opening connection to miniserver at {connection.Address}...");
-                await connection.OpenAsync(cancellationToken);
-                Console.WriteLine($"Connected to Miniserver {connection.MiniserverInfo.SerialNumber}, FW version {connection.MiniserverInfo.FirmwareVersion}");
-
-                // Load cached structure file or download a fresh one if the local file does not exist or is outdated.
-                string structureFileName = $"LoxAPP3.{connection.MiniserverInfo.SerialNumber}.json";
-                StructureFile structureFile = null;
-                if (File.Exists(structureFileName))
-                {
-                    structureFile = await StructureFile.LoadAsync(structureFileName, cancellationToken);
-                    var lastModified = await connection.GetStructureFileLastModifiedDateAsync(cancellationToken);
-                    if (lastModified > structureFile.LastModified)
-                    {
-                        // Structure file cached locally is outdated, throw it away.
-                        Console.WriteLine("Cached structure file is outdated.");
-                        structureFile = null;
-                    }
-                }
-
-                if (structureFile == null)
-                {
-                    // The structure file either did not exist on disk or was outdated. Download a fresh copy from
-                    // miniserver right now.
-                    Console.WriteLine("Downloading structure file...");
-                    structureFile = await connection.DownloadStructureFileAsync(cancellationToken);
-
-                    // Save it locally on disk.
-                    await structureFile.SaveAsync(structureFileName, cancellationToken);
-                }
-
-                Console.WriteLine($"Structure file loaded.");
-                Console.WriteLine($"  Culture: {structureFile.Localization.Culture}");
-                Console.WriteLine($"  Last modified: {structureFile.LastModified}");
-                Console.WriteLine($"  Miniserver type: {structureFile.MiniserverInfo.MiniserverType}");
-
-                //Console.WriteLine($"Control types:");
-                //var groupedControls = structureFile.Controls.GroupBy(c => c.ControlType).Distinct().Select(c => c.Key);
-                //Console.WriteLine(String.Join("\r\n", groupedControls));
-
-                connection.ValueStateChanged += (sender, e) =>
-                {
-                    foreach (var change in e.ValueStates)
-                    {
-                        var control = structureFile.Controls.FindByStateUuid(change.Control);
-                        if (control != null)
-                            control.UpdateStateValue(change);
-                        Console.WriteLine(change);
-                    }
-                };
-
-                connection.TextStateChanged += (sender, e) =>
-                {
-                    foreach (var change in e.TextStates)
-                    {
-                        Console.WriteLine(change);
-                    }
-                };
-
-                Console.WriteLine("Enabling status updates...");
-                await connection.EnableStatusUpdatesAsync(cancellationToken);
-
-                /*Console.WriteLine("Press enter to give a pulse to the bathroom light");
-                Console.ReadLine();
-
-                Console.WriteLine("Switching on/off Bathroom light");
-                var bathroomLightController = structureFile.Controls.Single(c => c.Name.Contains("Bathroom") && c is LightControllerV2Control) as LightControllerV2Control;
-                var invoker = new CommandInvoker();
-                var bathroomSwitch = bathroomLightController.SubControls.FirstOrDefault(c => c is SwitchControl) as SwitchControl;
-                var command = new SwitchPulseCommand(bathroomSwitch, connection);
-                invoker.Command = command;
-                invoker.Execute();
-                */
-                Console.WriteLine("Status updates enabled, now receiving updates. Press Ctrl+C to quit.");
-                await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken).ConfigureAwait(false);
-                //_closingEvent.Wait();
-            }
-        }
-
         static async Task Main(string[] args)
         {
             var cancellationTokenSource = new CancellationTokenSource();
@@ -113,28 +34,75 @@ namespace Loxone.Client.Samples.Console
             Console.CancelKeyPress += (sender, e) =>
             {
                 Console.WriteLine("Aborted.");
-                cancellationTokenSource.Cancel();
-                //_closingEvent.Set();
-                //_closingEvent.Dispose();
             };
 
-            try
-            {
-                await new Program().RunAsync(cancellationTokenSource.Token);
-            }
-            catch (Exception ex) when (!System.Diagnostics.Debugger.IsAttached)
-            {
-                if (!(ex is OperationCanceledException && cancellationTokenSource.IsCancellationRequested))
+            var hostBuilder = CreateHostBuilder().Build();
+
+            await hostBuilder.RunAsync();
+        }
+        private static IHostBuilder CreateHostBuilder()
+        {
+            var builder = new ConfigurationBuilder();
+            builder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            builder.AddJsonFile("appsettings.development.json", optional: true, reloadOnChange: true);
+            Configuration = builder.Build();
+
+            return Host.CreateDefaultBuilder()
+                .ConfigureServices((b, services) => services.AddOptions())
+                .ConfigureServices((b, services) => services.Configure<LoxoneConfig>(Configuration.GetSection(nameof(LoxoneConfig))))
+                .ConfigureServices((_, services) => services.AddSingleton<ILoxoneStateQueue>(new LoxoneStateQueue()))
+                .ConfigureServices((b, services) => services.AddSingleton<MiniserverConnection>(service =>
                 {
-                    Console.WriteLine(ex);
-                }
+                    var config = service.GetRequiredService<IOptions<LoxoneConfig>>().Value;
+                    var queue = service.GetRequiredService<ILoxoneStateQueue>();
+                    var connection = new MiniserverConnection(queue, new Uri(config.Uri));
+
+                    return connection;
+                }))
+                .ConfigureServices((_, services) => services.AddHostedService<LoxoneHost>())
+                .ConfigureServices((_, services) => services.AddSingleton<ILoxoneService, LoxoneService>())
+                .ConfigureServices((_, services) => services.AddTransient<ILoxoneStateChangeHandler, LoxoneValueStateHandler>())
+                .ConfigureServices((_, services) => services.AddTransient<ILoxoneStateChangeHandler, LoxoneTextStateHandler>())
+                .ConfigureServices((_, services) => services.AddTransient<ILoxoneStateProcessor, LoxoneStateProcessor>());
+        }
+    }
+
+    public class LoxoneHost : IHostedService
+    {
+        private ILoxoneService _service;
+        private ILoxoneStateProcessor _processor;
+        private MiniserverConnection _connection;
+
+        public LoxoneHost(ILoxoneService service, ILoxoneStateProcessor processor, MiniserverConnection connection)
+        {
+            _service = service;
+            _processor = processor;
+            _connection = connection;
+        }
+
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            _ = _service.StartAsync(cancellationToken);
+
+            Console.WriteLine("Press enter to give a pulse to the first light switch");
+            Console.ReadLine();
+
+            Console.WriteLine("Switching on/off first light switch");
+            var lightController = _service.StructureFile.Controls.FirstOrDefault(c => c is LightControllerV2Control) as LightControllerV2Control;
+            if (lightController != null)
+            {
+                var invoker = new CommandInvoker();
+                var lightSwitch = lightController.SubControls.FirstOrDefault(c => c is LightSwitchControl) as LightSwitchControl;
+                var command = new SwitchPulseCommand(lightSwitch, _connection);
+                invoker.Command = command;
+                invoker.Execute();
             }
         }
 
-        private static async Task StructureFileRoundTripAsync()
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            var structureFile = await StructureFile.LoadAsync("LoxAPP3.json", CancellationToken.None);
-            await structureFile.SaveAsync("LoxAPP3.roundtripped.json", CancellationToken.None);
+            await _service.StopAsync(cancellationToken);
+            _processor = null;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="ValueState.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -12,7 +12,7 @@ namespace Loxone.Client
 {
     using System;
 
-    public readonly struct ValueState
+    public readonly struct ValueState : IStateChange
     {
         private readonly Uuid _control;
 

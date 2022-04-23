@@ -34,6 +34,7 @@ namespace Loxone.Client
         }
 
         private volatile int _state;
+        private ILoxoneStateQueue _stateQueue;
 
         public bool IsDisposed => _state >= (int)State.Disposing;
 
@@ -130,69 +131,16 @@ namespace Loxone.Client
         private Transport.Encryptor _requestOnlyEncryptor;
         private Transport.Encryptor _requestAndResponseEncryptor;
 
-        public event EventHandler<ValueStateEventArgs> ValueStateChanged;
-
-        protected void OnValueStateChanged(ValueStateEventArgs e)
-        {
-            Contract.Requires(e != null);
-            ValueStateChanged?.Invoke(this, e);
-        }
-
-        public event EventHandler<TextStateEventArgs> TextStateChanged;
-
-        protected void OnValueStateChanged(TextStateEventArgs e)
-        {
-            Contract.Requires(e != null);
-            TextStateChanged?.Invoke(this, e);
-        }
-
-        public MiniserverConnection()
-        {
-            _miniserverInfo = new MiniserverLimitedInfo();
-            _state = (int)State.Constructed;
-        }
-
-        public MiniserverConnection(Uri address)
-            : this()
+        public MiniserverConnection(ILoxoneStateQueue stateQueue, Uri address)
         {
             Contract.Requires(address != null);
             Contract.Requires(HttpUtils.IsHttpUri(address));
             Contract.Requires(String.IsNullOrEmpty(address.PathAndQuery));
 
+            _miniserverInfo = new MiniserverLimitedInfo();
+            _state = (int)State.Constructed;
+            _stateQueue = stateQueue;
             InitWithUri(address);
-        }
-
-        public MiniserverConnection(IPEndPoint endpoint)
-            : this()
-        {
-            Contract.Requires(endpoint != null);
-
-            InitWithEndpoint(endpoint);
-        }
-
-        public MiniserverConnection(IPAddress address, int port)
-            : this()
-        {
-            Contract.Requires(address != null);
-            Contract.Requires(port >= IPEndPoint.MinPort && port <= IPEndPoint.MaxPort);
-
-            InitWithEndpoint(new IPEndPoint(address, port));
-        }
-
-        public MiniserverConnection(IPAddress address)
-            : this(address, HttpUtils.DefaultHttpPort)
-        {
-        }
-
-        private void InitWithEndpoint(IPEndPoint endpoint)
-        {
-            var builder = new UriBuilder(HttpUtils.HttpScheme, endpoint.Address.ToString());
-            if (endpoint.Port != HttpUtils.DefaultHttpPort)
-            {
-                builder.Port = endpoint.Port;
-            }
-
-            InitWithUri(builder.Uri);
         }
 
         private void InitWithUri(Uri address)
@@ -213,7 +161,7 @@ namespace Loxone.Client
 
             try
             {
-                _webSocket = new Transport.LXWebSocket(HttpUtils.MakeWebSocketUri(_baseUri), this, this);
+                _webSocket = new Transport.LXWebSocket(HttpUtils.MakeWebSocketUri(_baseUri), this, _stateQueue);
                 _session = new Transport.Session(_webSocket);
                 await CheckMiniserverReachableAsync(cancellationToken).ConfigureAwait(false);
                 await OpenWebSocketAsync(cancellationToken).ConfigureAwait(false);
@@ -254,10 +202,12 @@ namespace Loxone.Client
             return DateTime.SpecifyKind(response.Value, DateTimeKind.Local);
         }
 
-        public async Task EnableStatusUpdatesAsync(CancellationToken cancellationToken)
+        public async Task<bool> EnableStatusUpdatesAsync(CancellationToken cancellationToken)
         {
             CheckBeforeOperation();
             var response = await _webSocket.RequestCommandAsync<string>("jdev/sps/enablebinstatusupdate", _defaultEncryption, cancellationToken).ConfigureAwait(false);
+
+            return response.Code == 200;
         }
 
         private void CheckBeforeOpen()
@@ -392,22 +342,32 @@ namespace Loxone.Client
 
         void Transport.IEventListener.OnValueStateChanged(System.Collections.Generic.IReadOnlyList<ValueState> values)
         {
+            foreach(var v in values)
+            {
+                _stateQueue.EnqueueAsync(v);
+            }
+            /*
             var handler = ValueStateChanged;
             if (handler != null)
             {
                 var e = new ValueStateEventArgs(values);
                 handler(this, e);
-            }
+            }*/
         }
 
         void Transport.IEventListener.OnTextStateChanged(System.Collections.Generic.IReadOnlyList<TextState> values)
         {
+            foreach (var v in values)
+            {
+                _stateQueue.EnqueueAsync(v);
+            }
+            /*
             var handler = TextStateChanged;
             if (handler != null)
             {
                 var e = new TextStateEventArgs(values);
                 handler(this, e);
-            }
+            }*/
         }
 
         #region IDisposable Implementation
@@ -428,9 +388,7 @@ namespace Loxone.Client
                 if (Interlocked.Exchange(ref _state, (int)State.Disposing) != (int)State.Disposing)
                 {
                     // Disconnect event handlers.
-                    ValueStateChanged = null;
-                    TextStateChanged = null;
-
+                    
                     if (disposing)
                     {
                         _keepAliveTimer?.Dispose();

@@ -111,9 +111,9 @@ namespace Loxone.Client
         {
         }
     }
-    public class SwitchControl : ReadOnlyControl
+    public class LightSwitchControl : ReadOnlyControl
     {
-        public SwitchControl(ControlDTO controlDTO) : base(controlDTO)
+        public LightSwitchControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
         
@@ -121,9 +121,9 @@ namespace Loxone.Client
                 var uuid = States["active"];
                 if (uuid == null)
                     return false;
-                StateValues.TryGetValue(uuid, out object val);
-                if(val is bool)
-                    return (bool)val;
+                StateValues.TryGetValue(uuid, out object obj);
+                if(int.TryParse(obj.ToString(), out int val))
+                    return val == 1;
 
                 return false;
             } }

@@ -77,7 +77,7 @@ namespace Loxone.Client
         {
             get
             {
-                if(_controls == null)
+                if (_controls == null)
                 {
                     _controls = new ControlsCollection(_innerFile.Controls, new ControlFactory());
                 }

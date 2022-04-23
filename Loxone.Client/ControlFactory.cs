@@ -46,7 +46,7 @@ namespace Loxone.Client
                 case "ClimateController":
                     return new ClimateControllerControl(controlDTO);
                 case "Switch":
-                    return new SwitchControl(controlDTO);
+                    return new LightSwitchControl(controlDTO);
                 case "LoadManager":
                     return new LoadManagerControl(controlDTO);
                 case "CentralLightController":

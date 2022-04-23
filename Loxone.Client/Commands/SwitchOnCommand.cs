@@ -7,9 +7,9 @@ namespace Loxone.Client.Commands
 
     public class SwitchPulseCommand : CommandBase
     {
-        private SwitchControl _switchControl;
+        private LightSwitchControl _switchControl;
 
-        public SwitchPulseCommand(SwitchControl control, MiniserverConnection connection) : base(control, connection)
+        public SwitchPulseCommand(LightSwitchControl control, MiniserverConnection connection) : base(control, connection)
         {
             _switchControl = control;
         }
