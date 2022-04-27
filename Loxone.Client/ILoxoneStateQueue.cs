@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="StructureFile.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -16,5 +16,6 @@ namespace Loxone.Client
     {
         Task EnqueueAsync(IStateChange stateChange);
         Task<(bool success, IStateChange stateChange)> TryDequeueAsync();
+        int Count();
     }
 }

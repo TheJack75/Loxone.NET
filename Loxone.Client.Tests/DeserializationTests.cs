@@ -11,6 +11,7 @@
 namespace Loxone.Client.Tests
 {
     using System;
+    using System.Reflection;
     using Loxone.Client.Transport;
     using Loxone.Client.Transport.Serialization.Responses;
     using Microsoft.VisualStudio.TestTools.UnitTesting;

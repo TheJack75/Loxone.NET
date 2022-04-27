@@ -12,7 +12,7 @@ namespace Loxone.Client.Transport
 {
     using System.Text.Json.Serialization;
 
-    internal sealed class LXResponse<TValue>
+    public sealed class LXResponse<TValue>
     {
         private struct Root
         {

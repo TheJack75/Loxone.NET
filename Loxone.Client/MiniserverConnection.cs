@@ -22,7 +22,7 @@ namespace Loxone.Client
     /// <summary>
     /// Encapsulates connection to the Loxone Miniserver.
     /// </summary>
-    public class MiniserverConnection : IDisposable, Transport.IEncryptorProvider, Transport.IEventListener
+    public class MiniserverConnection : Transport.IEncryptorProvider, IMiniserverConnection
     {
         private enum State
         {
@@ -189,7 +189,7 @@ namespace Loxone.Client
             return StructureFile.Parse(s);
         }
 
-        internal async Task<LXResponse<string>> SendCommand<TCommand>(TCommand command, CancellationToken cancellationToken) where TCommand : CommandBase
+        public async Task<LXResponse<string>> SendCommand<TCommand>(TCommand command, CancellationToken cancellationToken) where TCommand : CommandBase
         {
             var response = await _webSocket.RequestCommandAsync<string>($"jdev/sps/io/{command.GetActionUri()}", _defaultEncryption, cancellationToken).ConfigureAwait(false);
             return response;
@@ -340,36 +340,6 @@ namespace Loxone.Client
             }
         }
 
-        void Transport.IEventListener.OnValueStateChanged(System.Collections.Generic.IReadOnlyList<ValueState> values)
-        {
-            foreach(var v in values)
-            {
-                _stateQueue.EnqueueAsync(v);
-            }
-            /*
-            var handler = ValueStateChanged;
-            if (handler != null)
-            {
-                var e = new ValueStateEventArgs(values);
-                handler(this, e);
-            }*/
-        }
-
-        void Transport.IEventListener.OnTextStateChanged(System.Collections.Generic.IReadOnlyList<TextState> values)
-        {
-            foreach (var v in values)
-            {
-                _stateQueue.EnqueueAsync(v);
-            }
-            /*
-            var handler = TextStateChanged;
-            if (handler != null)
-            {
-                var e = new TextStateEventArgs(values);
-                handler(this, e);
-            }*/
-        }
-
         #region IDisposable Implementation
 
         protected void CheckDisposed()
@@ -388,7 +358,7 @@ namespace Loxone.Client
                 if (Interlocked.Exchange(ref _state, (int)State.Disposing) != (int)State.Disposing)
                 {
                     // Disconnect event handlers.
-                    
+
                     if (disposing)
                     {
                         _keepAliveTimer?.Dispose();

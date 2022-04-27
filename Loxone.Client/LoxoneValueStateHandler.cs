@@ -38,8 +38,6 @@ namespace Loxone.Client
             System.Console.WriteLine($"{state} -> {control}");
             control.UpdateStateValue((ValueState)state);
 
-            //System.Console.WriteLine(state.ToString());
-
             return Task.CompletedTask;
         }
     }

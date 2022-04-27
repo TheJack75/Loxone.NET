@@ -6,9 +6,9 @@ namespace Loxone.Client.Commands
     public abstract class CommandBase
     {
         public ILoxoneControl Control { get; private set; }
-        public MiniserverConnection Connection { get; private set; }
+        public IMiniserverConnection Connection { get; private set; }
 
-        public CommandBase(ILoxoneControl control, MiniserverConnection connection)
+        public CommandBase(ILoxoneControl control, IMiniserverConnection connection)
         {
             Control = control;
             Connection = connection;

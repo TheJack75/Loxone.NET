@@ -48,10 +48,10 @@ namespace Loxone.Client.Samples.Console
             Configuration = builder.Build();
 
             return Host.CreateDefaultBuilder()
-                .ConfigureServices((b, services) => services.AddOptions())
-                .ConfigureServices((b, services) => services.Configure<LoxoneConfig>(Configuration.GetSection(nameof(LoxoneConfig))))
+                .ConfigureServices((_, services) => services.AddOptions())
+                .ConfigureServices((_, services) => services.Configure<LoxoneConfig>(Configuration.GetSection(nameof(LoxoneConfig))))
                 .ConfigureServices((_, services) => services.AddSingleton<ILoxoneStateQueue>(new LoxoneStateQueue()))
-                .ConfigureServices((b, services) => services.AddSingleton<MiniserverConnection>(service =>
+                .ConfigureServices((_, services) => services.AddSingleton<IMiniserverConnection>(service =>
                 {
                     var config = service.GetRequiredService<IOptions<LoxoneConfig>>().Value;
                     var queue = service.GetRequiredService<ILoxoneStateQueue>();
@@ -71,9 +71,9 @@ namespace Loxone.Client.Samples.Console
     {
         private ILoxoneService _service;
         private ILoxoneStateProcessor _processor;
-        private MiniserverConnection _connection;
+        private IMiniserverConnection _connection;
 
-        public LoxoneHost(ILoxoneService service, ILoxoneStateProcessor processor, MiniserverConnection connection)
+        public LoxoneHost(ILoxoneService service, ILoxoneStateProcessor processor, IMiniserverConnection connection)
         {
             _service = service;
             _processor = processor;
@@ -95,7 +95,7 @@ namespace Loxone.Client.Samples.Console
                 var lightSwitch = lightController.SubControls.FirstOrDefault(c => c is LightSwitchControl) as LightSwitchControl;
                 var command = new SwitchPulseCommand(lightSwitch, _connection);
                 invoker.Command = command;
-                invoker.Execute();
+                await invoker.Execute();
             }
         }
 

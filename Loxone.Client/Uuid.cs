@@ -71,7 +71,7 @@ namespace Loxone.Client
             {
                 return (Guid.ParseExact(guid, "N"), subId);
             }
-            catch(Exception ex)
+            catch
             {
 
             }

@@ -18,13 +18,13 @@ namespace Loxone.Client
 
     public class LoxoneService : ILoxoneService
     {
-        MiniserverConnection _connection;
+        private IMiniserverConnection _connection;
         private LoxoneConfig _config;
         private StructureFile _structureFile;
 
         public StructureFile StructureFile => _structureFile;
 
-        public LoxoneService(MiniserverConnection connection, IOptions<LoxoneConfig> configOptions)
+        public LoxoneService(IMiniserverConnection connection, IOptions<LoxoneConfig> configOptions)
         {
             _connection = connection;
             _config = configOptions.Value;
@@ -79,9 +79,10 @@ namespace Loxone.Client
             Console.WriteLine("Status updates enabled, now receiving updates. Press Ctrl+C to quit.");
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(CancellationToken cancellationToken)
         {
             _connection?.Dispose();
+            return Task.CompletedTask;
         }
     }
 }

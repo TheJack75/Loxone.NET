@@ -31,5 +31,10 @@ namespace Loxone.Client
         {
             return Task.Run(() => _queue.Enqueue(stateChange));
         }
+
+        public int Count()
+        {
+            return _queue.Count;
+        }
     }
 }
