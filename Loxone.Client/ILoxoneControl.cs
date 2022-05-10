@@ -11,6 +11,7 @@
 namespace Loxone.Client
 {
     using System.Collections.Generic;
+    using Loxone.Client.Controls;
 
     public interface ILoxoneControl
     {
@@ -23,5 +24,6 @@ namespace Loxone.Client
         IReadOnlyDictionary<string, Uuid> States { get; }
         ControlsCollection SubControls { get; }
         void UpdateStateValue(ValueState change);
+        void UpdateStateValue(TextState change);
     }
 }

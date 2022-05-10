@@ -1,12 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <PackageId>Loxone.NET</PackageId>
+    <PackageId>TheJack0.Loxone.NET</PackageId>
     <Description>Allows connecting to Loxone Miniserver from .NET application.</Description>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageVersion>1.0.3</PackageVersion>
     <NeutralLanguage>en</NeutralLanguage>
-    <Product>Loxone.NET</Product>
-    <Authors>manison</Authors>
+    <Product>TheJack0.Loxone.NET</Product>
+    <Authors>manison,TheJack</Authors>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <AssemblyVersion></AssemblyVersion>
+    <Version>1.0.2</Version>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />

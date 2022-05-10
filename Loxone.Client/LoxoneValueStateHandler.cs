@@ -35,7 +35,9 @@ namespace Loxone.Client
             if (control == null)
                 return Task.CompletedTask;
 
-            System.Console.WriteLine($"{state} -> {control}");
+            if(control.ControlType.ToLower() != "hourcounter")
+                System.Console.WriteLine($"{state} -> {control}");
+
             control.UpdateStateValue((ValueState)state);
 
             return Task.CompletedTask;

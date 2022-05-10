@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="DeserializationTests.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -40,32 +40,33 @@ namespace Loxone.Client.Tests
         {
         }
 
-        public async Task<Client.StructureFile> DownloadStructureFileAsync(CancellationToken cancellationToken)
+        public Task<Client.StructureFile> DownloadStructureFileAsync(CancellationToken cancellationToken)
         {
             var bytes = Properties.Resources.LoxAPP3_504F94A0DDB8_json;
             var json = System.Text.Json.JsonDocument.Parse(bytes);
 
-            return Client.StructureFile.Parse(json.RootElement.ToString());
+            return Task.FromResult(Client.StructureFile.Parse(json.RootElement.ToString()));
         }
 
-        public async Task<bool> EnableStatusUpdatesAsync(CancellationToken cancellationToken)
+        public Task<bool> EnableStatusUpdatesAsync(CancellationToken cancellationToken)
         {
-            return true;
+            return Task.FromResult(true);
         }
 
-        public async Task<DateTime> GetStructureFileLastModifiedDateAsync(CancellationToken cancellationToken)
+        public Task<DateTime> GetStructureFileLastModifiedDateAsync(CancellationToken cancellationToken)
         {
             DateTime lastWriteTime = DateTime.MinValue;
-            return lastWriteTime;
+            return Task.FromResult(lastWriteTime);
         }
 
-        public async Task OpenAsync(CancellationToken cancellationToken)
+        public Task OpenAsync(CancellationToken cancellationToken)
         {
+            return Task.CompletedTask;
         }
 
-        public async Task<LXResponse<string>> SendCommand<TCommand>(TCommand command, CancellationToken cancellationToken) where TCommand : CommandBase
-        {
-            return new LXResponse<string> { Code = 200, Control = "{C20C228C-2C10-4E19-97CA-9E905B54AA44}", Value = "1" };
+        public Task<LXResponse<string>> SendCommand<TCommand>(TCommand command, CancellationToken cancellationToken) where TCommand : CommandBase
+        {            
+            return Task.FromResult(new LXResponse<string> { Code = 200, Control = "{C20C228C-2C10-4E19-97CA-9E905B54AA44}", Value = "1" });
         }
     }
 }

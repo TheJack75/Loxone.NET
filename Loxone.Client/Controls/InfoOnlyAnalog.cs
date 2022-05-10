@@ -8,19 +8,24 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Controls
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
+    using Loxone.Client.Transport;
 
-    public interface ILoxoneService
+    public class InfoOnlyAnalog : ReadOnlyControl
     {
-        event EventHandler<EventArgs> StructureFileChanged;
+        public InfoOnlyAnalog(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
 
-        StructureFile StructureFile { get; }
+        public double Value
+        {
+            get
+            {
+                return GetStateValueAs<double>("value");
+            }
+        }
 
-        Task StartAsync(CancellationToken cancellationToken);
-        Task StopAsync(CancellationToken cancellationToken);
+        public string Format => Details["format"].ToString();
     }
 }

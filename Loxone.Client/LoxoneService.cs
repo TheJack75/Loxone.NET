@@ -18,11 +18,22 @@ namespace Loxone.Client
 
     public class LoxoneService : ILoxoneService
     {
+        public event EventHandler<EventArgs> StructureFileChanged;
+
         private IMiniserverConnection _connection;
         private LoxoneConfig _config;
         private StructureFile _structureFile;
 
-        public StructureFile StructureFile => _structureFile;
+        public StructureFile StructureFile
+        {
+            get { return _structureFile; }
+            set { _structureFile = value; OnStructureFileChanged(); }
+        }
+
+        private void OnStructureFileChanged()
+        {
+            StructureFileChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         public LoxoneService(IMiniserverConnection connection, IOptions<LoxoneConfig> configOptions)
         {
@@ -40,34 +51,34 @@ namespace Loxone.Client
 
             // Load cached structure file or download a fresh one if the local file does not exist or is outdated.
             string structureFileName = $"LoxAPP3.{_connection.MiniserverInfo.SerialNumber}.json";
-            _structureFile = null;
+            StructureFile = null;
             if (File.Exists(structureFileName))
             {
-                _structureFile = await StructureFile.LoadAsync(structureFileName, cancellationToken);
+                StructureFile = await StructureFile.LoadAsync(structureFileName, cancellationToken);
                 var lastModified = await _connection.GetStructureFileLastModifiedDateAsync(cancellationToken);
-                if (lastModified > _structureFile.LastModified)
+                if (lastModified > StructureFile.LastModified)
                 {
                     // Structure file cached locally is outdated, throw it away.
                     Console.WriteLine("Cached structure file is outdated.");
-                    _structureFile = null;
+                    StructureFile = null;
                 }
             }
 
-            if (_structureFile == null)
+            if (StructureFile == null)
             {
                 // The structure file either did not exist on disk or was outdated. Download a fresh copy from
                 // miniserver right now.
                 Console.WriteLine("Downloading structure file...");
-                _structureFile = await _connection.DownloadStructureFileAsync(cancellationToken);
+                StructureFile = await _connection.DownloadStructureFileAsync(cancellationToken);
 
                 // Save it locally on disk.
-                await _structureFile.SaveAsync(structureFileName, cancellationToken);
+                await StructureFile.SaveAsync(structureFileName, cancellationToken);
             }
 
             Console.WriteLine($"Structure file loaded.");
-            Console.WriteLine($"  Culture: {_structureFile.Localization.Culture}");
-            Console.WriteLine($"  Last modified: {_structureFile.LastModified}");
-            Console.WriteLine($"  Miniserver type: {_structureFile.MiniserverInfo.MiniserverType}");
+            Console.WriteLine($"  Culture: {StructureFile.Localization.Culture}");
+            Console.WriteLine($"  Last modified: {StructureFile.LastModified}");
+            Console.WriteLine($"  Miniserver type: {StructureFile.MiniserverInfo.MiniserverType}");
 
             //Console.WriteLine($"Control types:");
             //var groupedControls = structureFile.Controls.GroupBy(c => c.ControlType).Distinct().Select(c => c.Key);

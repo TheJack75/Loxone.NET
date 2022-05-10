@@ -30,7 +30,11 @@ namespace Loxone.Client
         {
             var control = _service.StructureFile.Controls.FindByStateUuid(state.Control);
 
+            if(control == null)
+                return Task.CompletedTask;
+
             System.Console.WriteLine($"{state} -> {control}");
+            control.UpdateStateValue((TextState)state);
 
             System.Console.WriteLine(state.ToString());
             return Task.CompletedTask;

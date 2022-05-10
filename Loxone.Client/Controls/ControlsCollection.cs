@@ -8,8 +8,9 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Controls
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
@@ -24,14 +25,14 @@ namespace Loxone.Client
         {
             _controls = controlFactory.Create(controls);
             var allStates = _controls.Values.ToDictionary(v => v, v => v.States);
-            
+
             var controlStates = new Dictionary<Uuid, ILoxoneControl>();
             foreach (var kvp in allStates)
             {
-                foreach(var state in kvp.Value)
+                foreach (var state in kvp.Value)
                 {
                     controlStates.Add(state.Value, kvp.Key);
-                    
+
                 }
 
                 foreach (var subControl in kvp.Key.SubControls)
@@ -59,7 +60,7 @@ namespace Loxone.Client
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
         public ILoxoneControl FindByStateUuid(Uuid stateUuid)
@@ -69,12 +70,7 @@ namespace Loxone.Client
         }
     }
 
-    public class LightControllerV2Control : ReadOnlyControl
-    {
-        public LightControllerV2Control(ControlDTO controlDTO) : base(controlDTO)
-        {
-        }
-    }
+    
     public class AudioZoneV2Control : ReadOnlyControl
     {
         public AudioZoneV2Control(ControlDTO controlDTO) : base(controlDTO)
@@ -84,18 +80,6 @@ namespace Loxone.Client
     public class RoomControllerV2Control : ReadOnlyControl
     {
         public RoomControllerV2Control(ControlDTO controlDTO) : base(controlDTO)
-        {
-        }
-    }
-    public class PresenceDetectorControl : ReadOnlyControl
-    {
-        public PresenceDetectorControl(ControlDTO controlDTO) : base(controlDTO)
-        {
-        }
-    }
-    public class JalousieControl : ReadOnlyControl
-    {
-        public JalousieControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
@@ -116,17 +100,22 @@ namespace Loxone.Client
         public LightSwitchControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
-        
-        public bool IsOn { get {
+
+        public bool IsOn
+        {
+            get
+            {
+                /*
                 var uuid = States["active"];
                 if (uuid == null)
                     return false;
                 StateValues.TryGetValue(uuid, out object obj);
                 if(int.TryParse(obj.ToString(), out int val))
                     return val == 1;
-
-                return false;
-            } }
+                return false;*/
+                return GetStateValueAsBool("active");
+            }
+        }
     }
     public class LoadManagerControl : ReadOnlyControl
     {
@@ -173,12 +162,6 @@ namespace Loxone.Client
     public class CentralJalousieControl : ReadOnlyControl
     {
         public CentralJalousieControl(ControlDTO controlDTO) : base(controlDTO)
-        {
-        }
-    }
-    public class WindowMonitorControl : ReadOnlyControl
-    {
-        public WindowMonitorControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }

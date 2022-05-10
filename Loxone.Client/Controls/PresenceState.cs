@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------
 // <copyright file="StructureFile.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -8,14 +8,14 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Controls
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    public interface ILoxoneStateProcessor
+    public enum PresenceState
     {
-        Task StartAsync(CancellationToken cancellationToken);
-        Task StopAsync(CancellationToken cancellationToken);
+        NoPresence = 0,
+        PresenceActive = 1,
+        MotionActive = 2,
+        PresenceAndMotion = 3,
+        PresenceAndSwitchOffWarning = 5
     }
 }

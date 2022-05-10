@@ -8,7 +8,7 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Controls
 {
     using System.Collections.Generic;
     using Loxone.Client.Transport;
@@ -19,7 +19,7 @@ namespace Loxone.Client
         {
             var result = new Dictionary<string, ILoxoneControl>();
 
-            foreach(var pair in controlDTOs)
+            foreach (var pair in controlDTOs)
             {
                 result.Add(pair.Key, Create(pair.Value));
             }
@@ -29,7 +29,7 @@ namespace Loxone.Client
 
         public ILoxoneControl Create(ControlDTO controlDTO)
         {
-            switch(controlDTO.ControlType)
+            switch (controlDTO.ControlType)
             {
                 case "LightControllerV2":
                     return new LightControllerV2Control(controlDTO);
@@ -81,6 +81,10 @@ namespace Loxone.Client
                     return new NfcCodeTouchControl(controlDTO);
                 case "Intercom":
                     return new IntercomControl(controlDTO);
+                case "InfoOnlyAnalog":
+                    return new InfoOnlyAnalog(controlDTO);
+                case "InfoOnlyDigital":
+                    return new InfoOnlyDigital(controlDTO);
                 default:
                     return new ReadOnlyControl(controlDTO);
             }

@@ -15,7 +15,7 @@ namespace Loxone.Client
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class LoxoneStateProcessor : ILoxoneStateProcessor
+    public class LoxoneStateProcessor : ILoxoneStateProcessor, IDisposable
     {
         private readonly ILoxoneStateQueue _queue;
         private readonly IEnumerable<ILoxoneStateChangeHandler> _handlers;
@@ -26,7 +26,27 @@ namespace Loxone.Client
         {
             _queue = queue;
             _handlers = handlers;
-            _timer = new Timer(ProcessStates, null, 0, 500);
+            _timer = new Timer(ProcessStates, null, Timeout.Infinite, Timeout.Infinite);
+        }
+
+        public void Dispose()
+        {
+            _timer.Dispose();
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            _timer.Change(0, 500);
+
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            _timer.Change(Timeout.Infinite, Timeout.Infinite);
+            _timer.Dispose();
+
+            return Task.CompletedTask;
         }
 
         private async void ProcessStates(object state)

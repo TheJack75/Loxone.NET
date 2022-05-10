@@ -13,7 +13,6 @@ namespace Loxone.Client.Samples.Console
     using System;
     using System.Collections;
     using System.IO;
-    using System.Linq;
     using System.Runtime.Serialization;
     using System.Threading;
     using System.Threading.Tasks;
@@ -64,45 +63,6 @@ namespace Loxone.Client.Samples.Console
                 .ConfigureServices((_, services) => services.AddTransient<ILoxoneStateChangeHandler, LoxoneValueStateHandler>())
                 .ConfigureServices((_, services) => services.AddTransient<ILoxoneStateChangeHandler, LoxoneTextStateHandler>())
                 .ConfigureServices((_, services) => services.AddTransient<ILoxoneStateProcessor, LoxoneStateProcessor>());
-        }
-    }
-
-    public class LoxoneHost : IHostedService
-    {
-        private ILoxoneService _service;
-        private ILoxoneStateProcessor _processor;
-        private IMiniserverConnection _connection;
-
-        public LoxoneHost(ILoxoneService service, ILoxoneStateProcessor processor, IMiniserverConnection connection)
-        {
-            _service = service;
-            _processor = processor;
-            _connection = connection;
-        }
-
-        public async Task StartAsync(CancellationToken cancellationToken)
-        {
-            _ = _service.StartAsync(cancellationToken);
-
-            Console.WriteLine("Press enter to give a pulse to the first light switch");
-            Console.ReadLine();
-
-            Console.WriteLine("Switching on/off first light switch");
-            var lightController = _service.StructureFile.Controls.FirstOrDefault(c => c is LightControllerV2Control) as LightControllerV2Control;
-            if (lightController != null)
-            {
-                var invoker = new CommandInvoker();
-                var lightSwitch = lightController.SubControls.FirstOrDefault(c => c is LightSwitchControl) as LightSwitchControl;
-                var command = new SwitchPulseCommand(lightSwitch, _connection);
-                invoker.Command = command;
-                await invoker.Execute();
-            }
-        }
-
-        public async Task StopAsync(CancellationToken cancellationToken)
-        {
-            await _service.StopAsync(cancellationToken);
-            _processor = null;
         }
     }
 }
