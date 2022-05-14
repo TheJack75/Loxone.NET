@@ -48,11 +48,6 @@ namespace Loxone.Client
         {
             get
             {
-                if (_rooms == null)
-                {
-                    _rooms = new RoomCollection(_innerFile.Rooms);
-                }
-
                 return _rooms;
             }
         }
@@ -63,37 +58,47 @@ namespace Loxone.Client
         {
             get
             {
-                if (_categories == null)
-                {
-                    _categories = new CategoryCollection(_innerFile.Categories);
-                }
-
                 return _categories;
             }
         }
 
         private ControlsCollection _controls;
 
-        public ControlsCollection Controls
-        {
-            get
-            {
-                if (_controls == null)
-                {
-                    _controls = new ControlsCollection(_innerFile.Controls, new ControlFactory());
-                }
-
-                return _controls;
-            }
-        }
+        public ControlsCollection Controls => _controls;
 
         private StructureFile(Transport.StructureFile innerFile)
         {
             Contract.Requires(innerFile != null);
-            this._innerFile = innerFile;
-            this._miniserverInfo = new MiniserverInfo(_innerFile.MiniserverInfo);
-            this._project = new ProjectInfo(_innerFile.MiniserverInfo);
-            this._localization = new LocalizationInfo(_innerFile.MiniserverInfo);
+            _innerFile = innerFile;
+            _miniserverInfo = new MiniserverInfo(_innerFile.MiniserverInfo);
+            _project = new ProjectInfo(_innerFile.MiniserverInfo);
+            _localization = new LocalizationInfo(_innerFile.MiniserverInfo);
+            _categories = new CategoryCollection(_innerFile.Categories);
+            _rooms = new RoomCollection(_innerFile.Rooms);
+            _controls = new ControlsCollection(_innerFile.Controls, new ControlFactory());
+
+            EnrichControls(_controls);
+        }
+
+        private void EnrichControls(ControlsCollection controls)
+        {
+            foreach (var control in controls)
+            {
+                EnrichControl(control);
+                EnrichControls(control.SubControls);
+            }
+        }
+
+        private void EnrichControl(ILoxoneControl control)
+        {
+            if (control == null)
+                return;
+
+            if(control.RoomId != null)
+                control.RoomName = _rooms.GetRoomName(control.RoomId.Value);
+
+            if(control.CategoryId != null)
+                control.CategoryName = _categories.GetCategoryName(control.CategoryId.Value);
         }
 
         public static StructureFile Parse(string s)

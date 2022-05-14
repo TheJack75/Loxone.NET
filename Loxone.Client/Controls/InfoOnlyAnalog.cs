@@ -12,8 +12,10 @@ namespace Loxone.Client.Controls
 {
     using Loxone.Client.Transport;
 
-    public class InfoOnlyAnalog : ReadOnlyControl
+    public class InfoOnlyAnalog : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.InfoOnlyAnalog;
+
         public InfoOnlyAnalog(ControlDTO controlDTO) : base(controlDTO)
         {
         }

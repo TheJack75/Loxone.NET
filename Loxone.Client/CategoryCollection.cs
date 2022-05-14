@@ -10,6 +10,7 @@
 
 namespace Loxone.Client
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
@@ -37,6 +38,14 @@ namespace Loxone.Client
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+
+        internal string GetCategoryName(Uuid value)
+        {
+            if (_innerCategories.TryGetValue(value.ToString(), out var category))
+                return category.Name;
+
+            return string.Empty;
         }
     }
 }

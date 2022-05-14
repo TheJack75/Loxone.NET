@@ -13,9 +13,11 @@ namespace Loxone.Client.Controls
     using System.Text.Json;
     using Loxone.Client.Transport;
 
-    public class PresenceDetectorControl : ReadOnlyControl
+    public class PresenceDetectorControl : LoxoneControlBase
     {
         private DetailsTextDTO _detailsText;
+
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.PresenceDetector;
 
         public PresenceDetectorControl(ControlDTO controlDTO) : base(controlDTO)
         {

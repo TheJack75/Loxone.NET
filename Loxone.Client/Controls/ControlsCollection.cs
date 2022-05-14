@@ -32,7 +32,6 @@ namespace Loxone.Client.Controls
                 foreach (var state in kvp.Value)
                 {
                     controlStates.Add(state.Value, kvp.Key);
-
                 }
 
                 foreach (var subControl in kvp.Key.SubControls)
@@ -41,7 +40,6 @@ namespace Loxone.Client.Controls
                     {
                         if (!controlStates.ContainsKey(state.Value))
                             controlStates.Add(state.Value, subControl);
-
                     }
                 }
             }
@@ -69,34 +67,43 @@ namespace Loxone.Client.Controls
             return control;
         }
     }
-
     
-    public class AudioZoneV2Control : ReadOnlyControl
+    public class AudioZoneV2Control : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.AudioZoneV2;
+
         public AudioZoneV2Control(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class RoomControllerV2Control : ReadOnlyControl
+    public class RoomControllerV2Control : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.IRoomControllerV2;
+
         public RoomControllerV2Control(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class CentralAudioZoneControl : ReadOnlyControl
+    public class CentralAudioZoneControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.CentralAudioZone;
+
         public CentralAudioZoneControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class ClimateControllerControl : ReadOnlyControl
+    public class ClimateControllerControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.ClimateController;
+
         public ClimateControllerControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class LightSwitchControl : ReadOnlyControl
+    public class LightSwitchControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.Switch;
+
         public LightSwitchControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
@@ -117,98 +124,130 @@ namespace Loxone.Client.Controls
             }
         }
     }
-    public class LoadManagerControl : ReadOnlyControl
+    public class LoadManagerControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.LoadManager;
+
         public LoadManagerControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class CentralLightControllerControl : ReadOnlyControl
+    public class CentralLightControllerControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.CentralLightController;
+
         public CentralLightControllerControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class WebpageControl : ReadOnlyControl
+    public class WebpageControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.Webpage;
+
         public WebpageControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class PulseAtControl : ReadOnlyControl
+    public class PulseAtControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.PulseAt;
+
         public PulseAtControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class AalSmartAlarmControl : ReadOnlyControl
+    public class AalSmartAlarmControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.AalSmartAlarm;
+
         public AalSmartAlarmControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class AlarmControl : ReadOnlyControl
+    public class AlarmControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.Alarm;
+
         public AlarmControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class SmokeAlarmControl : ReadOnlyControl
+    public class SmokeAlarmControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.SmokeAlarm;
+
         public SmokeAlarmControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class CentralJalousieControl : ReadOnlyControl
+    public class CentralJalousieControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.CentralJalousie;
+
         public CentralJalousieControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class AalEmergencyControl : ReadOnlyControl
+    public class AalEmergencyControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.AalEmergency;
+
         public AalEmergencyControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class CarChargerControl : ReadOnlyControl
+    public class CarChargerControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.CarCharger;
+
         public CarChargerControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class RemoteControl : ReadOnlyControl
+    public class RemoteControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.Remote;
+
         public RemoteControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class AlarmClockControl : ReadOnlyControl
+    public class AlarmClockControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.AlarmClock;
+
         public AlarmClockControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class EnergyManagerControl : ReadOnlyControl
+    public class EnergyManagerControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.EnergyManager;
+
         public EnergyManagerControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class FroniusControl : ReadOnlyControl
+    public class FroniusControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.Fronius;
+
         public FroniusControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class NfcCodeTouchControl : ReadOnlyControl
+    public class NfcCodeTouchControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.NfcCodeTouch;
+
         public NfcCodeTouchControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
     }
-    public class IntercomControl : ReadOnlyControl
+    public class IntercomControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.Intercom;
+
         public IntercomControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }

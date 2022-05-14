@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="RoomCollection.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -37,6 +37,14 @@ namespace Loxone.Client
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
+        }
+
+        public string GetRoomName(Uuid roomId)
+        {
+            if (_innerRooms.TryGetValue(roomId.ToString(), out var room))
+                return room.Name;
+
+            return string.Empty;
         }
     }
 }

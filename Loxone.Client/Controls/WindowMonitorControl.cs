@@ -17,8 +17,10 @@ namespace Loxone.Client.Controls
     using Loxone.Client.Transport;
     using Loxone.Client.Transport.Serialization;
 
-    public class WindowMonitorControl : ReadOnlyControl
+    public class WindowMonitorControl : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.WindowMonitor;
+        
         public IReadOnlyList<WindowsDTO> Windows { get; private set; } = new List<WindowsDTO>();
         public ushort OpenCount => GetStateValueAs<ushort>("numOpen");
         public ushort ClosedCount => GetStateValueAs<ushort>("numClosed");

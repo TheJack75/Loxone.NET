@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="StructureFile.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -12,7 +12,7 @@ namespace Loxone.Client.Controls
 {
     using Loxone.Client.Transport;
 
-    public class JalousieControl : ReadOnlyControl
+    public class JalousieControl : LoxoneControlBase
     {
         public JalousieControl(ControlDTO controlDTO) : base(controlDTO)
         {
@@ -22,5 +22,7 @@ namespace Loxone.Client.Controls
         public bool GoingDown => GetStateValueAsBool("down");
         public int Position => GetStateValueAs<int>("position");
         public int TargetPosition => GetStateValueAs<int>("targetPosition");
+
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.Jalousie;
     }
 }

@@ -22,8 +22,10 @@ namespace Loxone.Client.Controls
         public string Off { get; set; }
     }
 
-    public class InfoOnlyDigital : ReadOnlyControl
+    public class InfoOnlyDigital : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.InfoOnlyDigital;
+
         private class DetailsColorsDTO
         {
             [JsonPropertyName("on")]
@@ -52,8 +54,10 @@ namespace Loxone.Client.Controls
         public string HexColorOff => _detailsColor.HexColorOff;
     }
 
-    public class LightControllerV2Control : ReadOnlyControl
+    public class LightControllerV2Control : LoxoneControlBase
     {
+        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.LightControllerV2;
+
         public LightControllerV2Control(ControlDTO controlDTO) : base(controlDTO)
         {
         }

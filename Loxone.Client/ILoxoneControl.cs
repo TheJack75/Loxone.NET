@@ -19,8 +19,11 @@ namespace Loxone.Client
         string Name { get; }
         bool IsFavorite { get; }
         Uuid? RoomId { get; }
+        string RoomName { get; set; }
         Uuid? CategoryId { get; }
+        string CategoryName { get; set; }
         string ControlType { get; }
+        ControlTypeEnum ControlTypeEnum { get; }
         IReadOnlyDictionary<string, Uuid> States { get; }
         ControlsCollection SubControls { get; }
         void UpdateStateValue(ValueState change);
