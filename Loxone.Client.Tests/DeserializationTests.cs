@@ -67,8 +67,8 @@ namespace Loxone.Client.Tests
             Assert.IsNotNull(json);
             Assert.IsTrue(json.StartsWith('{'));
             var doc = JsonDocument.Parse(json);
-            var categoryProp = doc.RootElement.GetProperty("Category");
-            Assert.AreEqual(categoryProp.GetString(), json.Contains(CATEGORY_UUID));
+            var categoryProp = doc.RootElement.GetProperty("CategoryId");
+            Assert.AreEqual(categoryProp.GetString(), CATEGORY_UUID);
         }
     }
 }
