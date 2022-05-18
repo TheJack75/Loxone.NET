@@ -33,7 +33,7 @@ namespace Loxone.Client
         public IReadOnlyDictionary<string, Uuid> States { get; private set; }
         public ControlsCollection SubControls { get; private set; }
         public Dictionary<string, object> Details => _controlDTO.Details;
-        //[JsonConverter(typeof(UuidConverter))]
+        [JsonConverter(typeof(UuidAsDictionaryKeyConverter<object>))]
         public Dictionary<Uuid, object> StateValues { get; set; } = new Dictionary<Uuid, object>();
 
         public string RoomName { get; set; }

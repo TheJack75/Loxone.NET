@@ -50,6 +50,8 @@ namespace Loxone.Client.Tests
         public void SerializeReadOnlyControl()
         {
             const string CATEGORY_UUID = "0b734138-036d-0334-ffff403fb0c34b9e";
+            const string ACTIVE_STATE_UUID = "991bed10-01f9-2b85-ffff5e20fb3695f6";
+
             var control = new ReadOnlyControl(
                 new ControlDTO {
                     Uuid = Uuid.Parse("991bed10-01f9-2b85-ffff5e20fb3695f6"),
@@ -59,9 +61,10 @@ namespace Loxone.Client.Tests
                     Name = "Test control",
                     States = new System.Collections.Generic.Dictionary<string, string>
                     {
-                        {"jLocked", "991bed10-01f9-2b85-ffff5e20fb3695f6" }
-                    }
+                        {"active", ACTIVE_STATE_UUID }
+                    },
                 });
+            control.UpdateStateValue(new ValueState(Uuid.Parse(ACTIVE_STATE_UUID), 1));
 
             var json = System.Text.Json.JsonSerializer.Serialize(control);
             Assert.IsNotNull(json);
