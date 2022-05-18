@@ -3,13 +3,13 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>TheJack0.Loxone.NET</PackageId>
     <Description>Allows connecting to Loxone Miniserver from .NET application.</Description>
-    <PackageVersion>1.0.6</PackageVersion>
+    <PackageVersion>1.0.8</PackageVersion>
     <NeutralLanguage>en</NeutralLanguage>
     <Product>TheJack0.Loxone.NET</Product>
     <Authors>manison,TheJack</Authors>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <AssemblyVersion></AssemblyVersion>
-    <Version>1.0.6</Version>
+    <Version>1.0.8</Version>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
   <PropertyGroup>

@@ -12,6 +12,7 @@ namespace Loxone.Client.Tests
 {
     using System;
     using System.Reflection;
+    using System.Text.Json;
     using Loxone.Client.Transport;
     using Loxone.Client.Transport.Serialization.Responses;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -39,6 +40,35 @@ namespace Loxone.Client.Tests
             Assert.IsNotNull(r.Value);
             Assert.AreEqual(SerialNumber.Parse("AA:BB:CC:DD:EE:FF"), r.Value.SerialNumber);
             Assert.AreEqual(new Version(10, 3, 4, 10), r.Value.Version);
+        }
+    }
+
+    [TestClass]
+    public class SerializationTests
+    {
+        [TestMethod]
+        public void SerializeReadOnlyControl()
+        {
+            const string CATEGORY_UUID = "0b734138-036d-0334-ffff403fb0c34b9e";
+            var control = new ReadOnlyControl(
+                new ControlDTO {
+                    Uuid = Uuid.Parse("991bed10-01f9-2b85-ffff5e20fb3695f6"),
+                    ControlType = "InfoOnlyDigital",
+                    Category = Uuid.Parse(CATEGORY_UUID),
+                    IsFavorite = true,
+                    Name = "Test control",
+                    States = new System.Collections.Generic.Dictionary<string, string>
+                    {
+                        {"jLocked", "991bed10-01f9-2b85-ffff5e20fb3695f6" }
+                    }
+                });
+
+            var json = System.Text.Json.JsonSerializer.Serialize(control);
+            Assert.IsNotNull(json);
+            Assert.IsTrue(json.StartsWith('{'));
+            var doc = JsonDocument.Parse(json);
+            var categoryProp = doc.RootElement.GetProperty("Category");
+            Assert.AreEqual(categoryProp.GetString(), json.Contains(CATEGORY_UUID));
         }
     }
 }

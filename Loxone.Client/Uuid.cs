@@ -13,6 +13,8 @@ namespace Loxone.Client
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
+    using System.Text.Json.Serialization;
+    using Loxone.Client.Transport.Serialization;
 
     /// <summary>
     /// Unique 128b identifier to identify controls, inputs and outputs.
@@ -23,6 +25,7 @@ namespace Loxone.Client
     /// segment, <see cref="ToString"/> method). Therefore this UUID
     /// implementation is just a thin wrapper around the Guid.
     /// </devdoc>
+    [JsonConverter(typeof(UuidConverter))]
     public struct Uuid : IComparable, IComparable<Uuid>, IEquatable<Uuid>
     {
         private const char UUID_SEPARATOR = '/';

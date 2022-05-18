@@ -15,11 +15,13 @@ namespace Loxone.Client
     using System.Linq;
     using System;
     using Loxone.Client.Controls;
+    using System.Text.Json.Serialization;
+    using Loxone.Client.Transport.Serialization;
 
     public abstract class LoxoneControlBase : ILoxoneControl
     {
         private ControlDTO _controlDTO;
-
+        [JsonConverter(typeof(UuidConverter))]
         public Uuid Uuid => _controlDTO.Uuid;
         public string Name => _controlDTO.Name;
         public bool IsFavorite => _controlDTO.IsFavorite;
@@ -27,9 +29,11 @@ namespace Loxone.Client
         public Uuid? CategoryId => _controlDTO.Category;
         public string ControlType => _controlDTO.ControlType;
         public abstract ControlTypeEnum ControlTypeEnum { get; }
+        //[JsonConverter(typeof(UuidConverter))]
         public IReadOnlyDictionary<string, Uuid> States { get; private set; }
         public ControlsCollection SubControls { get; private set; }
         public Dictionary<string, object> Details => _controlDTO.Details;
+        //[JsonConverter(typeof(UuidConverter))]
         public Dictionary<Uuid, object> StateValues { get; set; } = new Dictionary<Uuid, object>();
 
         public string RoomName { get; set; }
