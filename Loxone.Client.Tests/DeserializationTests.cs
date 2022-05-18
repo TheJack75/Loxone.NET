@@ -11,7 +11,6 @@
 namespace Loxone.Client.Tests
 {
     using System;
-    using System.Reflection;
     using System.Text.Json;
     using Loxone.Client.Transport;
     using Loxone.Client.Transport.Serialization.Responses;
@@ -66,12 +65,21 @@ namespace Loxone.Client.Tests
                 });
             control.UpdateStateValue(new ValueState(Uuid.Parse(ACTIVE_STATE_UUID), 1));
 
-            var json = System.Text.Json.JsonSerializer.Serialize(control);
+            var json = JsonSerializer.Serialize(control);
             Assert.IsNotNull(json);
             Assert.IsTrue(json.StartsWith('{'));
             var doc = JsonDocument.Parse(json);
             var categoryProp = doc.RootElement.GetProperty("CategoryId");
             Assert.AreEqual(categoryProp.GetString(), CATEGORY_UUID);
+
+            var valueStateProp = doc.RootElement.GetProperty("StateValues");
+            foreach(var item in valueStateProp.EnumerateObject())
+            {
+                Assert.AreEqual(item.Name, ACTIVE_STATE_UUID);
+                Assert.AreEqual(item.Value.GetInt32(), 1);
+                break;
+            }
+            //Assert.AreEqual(valueStateProp.GetString())
         }
     }
 }
