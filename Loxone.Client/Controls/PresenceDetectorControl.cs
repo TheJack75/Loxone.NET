@@ -16,19 +16,14 @@ namespace Loxone.Client.Controls
 
     public class PresenceDetectorControl : LoxoneControlBase
     {
-        private DetailsTextDTO _detailsText;
-
         public PresenceDetectorControl(ControlDTO controlDTO) : base(controlDTO)
         {
-            _detailsText = JsonSerializer.Deserialize<DetailsTextDTO>(controlDTO.Details["text"].ToString());
+            var detailsText = JsonSerializer.Deserialize<DetailsTextDTO>(controlDTO.Details["text"].ToString());
+            TextOn = detailsText.On;
+            TextOff = detailsText.Off;
         }
 
-        public PresenceDetectorControl() : base()
-        {
-            _detailsText = new DetailsTextDTO();
-            TextOn = _detailsText.On;
-            TextOff = _detailsText.Off;
-        }
+        public PresenceDetectorControl() : base() { }
 
         public string TextOn { get; set; }
 
