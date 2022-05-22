@@ -26,11 +26,15 @@ namespace Loxone.Client
 
         public string Text => _text;
 
-        public TextState(Uuid control, Uuid icon, string text)
+        private readonly DateTimeOffset _lastModified;
+        public DateTimeOffset LastModified { get; set; }
+
+        public TextState(Uuid control, Uuid icon, string text, DateTimeOffset lastModified)
         {
             this._control = control;
             this._icon = icon;
             this._text = text ?? String.Empty;
+            _lastModified = lastModified;
         }
 
         public override string ToString()

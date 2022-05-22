@@ -24,8 +24,6 @@ namespace Loxone.Client.Controls
 
     public class InfoOnlyDigital : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.InfoOnlyDigital;
-
         private class DetailsColorsDTO
         {
             [JsonPropertyName("on")]
@@ -40,26 +38,24 @@ namespace Loxone.Client.Controls
         public InfoOnlyDigital(ControlDTO controlDTO) : base(controlDTO)
         {
             _detailsText = JsonSerializer.Deserialize<DetailsTextDTO>(controlDTO.Details["text"].ToString());
+            TextOn = _detailsText.On;
+            TextOff = _detailsText.Off;
+
             _detailsColor = JsonSerializer.Deserialize<DetailsColorsDTO>(controlDTO.Details["color"].ToString());
+            HexColorOn = _detailsColor.HexColorOn;
+            HexColorOff = _detailsColor.HexColorOff;
         }
 
-        public bool Active => GetStateValueAsBool("value");
+        public InfoOnlyDigital() : base(){}
 
-        public string TextOn => _detailsText.On;
+        public bool Active => GetStateValueAsBool("active");
 
-        public string TextOff => _detailsText.Off;
+        public string TextOn { get; set; }
 
-        public string HexColorOn => _detailsColor.HexColorOn;
+        public string TextOff { get; set; }
 
-        public string HexColorOff => _detailsColor.HexColorOff;
-    }
+        public string HexColorOn { get; set; }
 
-    public class LightControllerV2Control : LoxoneControlBase
-    {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.LightControllerV2;
-
-        public LightControllerV2Control(ControlDTO controlDTO) : base(controlDTO)
-        {
-        }
+        public string HexColorOff { get; set; }
     }
 }

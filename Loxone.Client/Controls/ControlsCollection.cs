@@ -14,16 +14,46 @@ namespace Loxone.Client.Controls
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.Json;
+    using System.Text.Json.Serialization;
     using Loxone.Client.Transport;
 
+    public class ControlsCollectionConverter : JsonConverter<ControlsCollection>
+    {
+        public override ControlsCollection Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            var controls = (List<ILoxoneControl> )JsonSerializer.Deserialize(ref reader, typeof(List<ILoxoneControl>), options);
+            var collection = new ControlsCollection();
+            controls.ForEach(c => collection.AddControl(c));
+
+            return collection;
+        }
+
+        public override void Write(Utf8JsonWriter writer, ControlsCollection value, JsonSerializerOptions options)
+        {
+            writer.WriteStartArray();
+            foreach(var control in value)
+            {
+                JsonSerializer.Serialize(writer, control);
+            }
+            writer.WriteEndArray();
+            //JsonSerializer.Serialize(writer, value.AsEnumerable(), options);
+        }
+    }
+
+    [JsonConverter(typeof(ControlsCollectionConverter))]
     public class ControlsCollection : IReadOnlyCollection<ILoxoneControl>, IEnumerable<ILoxoneControl>
     {
-        private readonly IReadOnlyDictionary<string, ILoxoneControl> _controls;
-        private readonly IReadOnlyDictionary<Uuid, ILoxoneControl> _controlByStateUuids;
+        private IDictionary<string, ILoxoneControl> _controls;
+        private IDictionary<Uuid, ILoxoneControl> _controlByStateUuids;
 
-        internal ControlsCollection(IDictionary<string, ControlDTO> controls, IControlFactory controlFactory)
+        public ControlsCollection()
         {
-            _controls = controlFactory.Create(controls);
+        }
+
+        public ControlsCollection(IDictionary<string, ControlDTO> controls, IControlFactory controlFactory)
+        {
+            _controls = (IDictionary<string, ILoxoneControl>) controlFactory.Create(controls);
             var allStates = _controls.Values.ToDictionary(v => v, v => v.States);
 
             var controlStates = new Dictionary<Uuid, ILoxoneControl>();
@@ -46,7 +76,15 @@ namespace Loxone.Client.Controls
             _controlByStateUuids = controlStates;
         }
 
+        public void AddControl(ILoxoneControl control)
+        {
+            _controlByStateUuids.Add(control.Uuid, control);
+            //_controls.Add()
+        }
+
         public int Count => _controls.Count;
+
+        public bool IsReadOnly => throw new NotImplementedException();
 
         public IEnumerator<ILoxoneControl> GetEnumerator()
         {
@@ -70,186 +108,159 @@ namespace Loxone.Client.Controls
     
     public class AudioZoneV2Control : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.AudioZoneV2;
-
         public AudioZoneV2Control(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+
+        public AudioZoneV2Control() : base() { }
     }
     public class RoomControllerV2Control : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.IRoomControllerV2;
-
         public RoomControllerV2Control(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+
+        public RoomControllerV2Control() : base() { }
     }
     public class CentralAudioZoneControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.CentralAudioZone;
-
         public CentralAudioZoneControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public CentralAudioZoneControl() : base() { }
     }
     public class ClimateControllerControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.ClimateController;
-
         public ClimateControllerControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public ClimateControllerControl() : base() { }
     }
     public class LightSwitchControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.Switch;
-
         public LightSwitchControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public LightSwitchControl() : base() { }
 
         public bool IsOn
         {
             get
             {
-                /*
-                var uuid = States["active"];
-                if (uuid == null)
-                    return false;
-                StateValues.TryGetValue(uuid, out object obj);
-                if(int.TryParse(obj.ToString(), out int val))
-                    return val == 1;
-                return false;*/
                 return GetStateValueAsBool("active");
             }
         }
     }
     public class LoadManagerControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.LoadManager;
-
         public LoadManagerControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public LoadManagerControl() : base() { }
     }
     public class CentralLightControllerControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.CentralLightController;
-
         public CentralLightControllerControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public CentralLightControllerControl() : base() { }
     }
     public class WebpageControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.Webpage;
-
         public WebpageControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public WebpageControl() : base() { }
     }
     public class PulseAtControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.PulseAt;
-
         public PulseAtControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public PulseAtControl() : base() { }
     }
     public class AalSmartAlarmControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.AalSmartAlarm;
-
         public AalSmartAlarmControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public AalSmartAlarmControl() : base() { }
     }
     public class AlarmControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.Alarm;
-
         public AlarmControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public AlarmControl() : base() { }
     }
     public class SmokeAlarmControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.SmokeAlarm;
-
         public SmokeAlarmControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public SmokeAlarmControl() : base() { }
     }
     public class CentralJalousieControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.CentralJalousie;
-
         public CentralJalousieControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public CentralJalousieControl() : base() { }
     }
     public class AalEmergencyControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.AalEmergency;
-
         public AalEmergencyControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public AalEmergencyControl() : base() { }
     }
     public class CarChargerControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.CarCharger;
-
         public CarChargerControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public CarChargerControl() : base() { }
     }
     public class RemoteControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.Remote;
-
         public RemoteControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public RemoteControl() : base() { }
     }
     public class AlarmClockControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.AlarmClock;
-
         public AlarmClockControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public AlarmClockControl() : base() { }
     }
     public class EnergyManagerControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.EnergyManager;
-
         public EnergyManagerControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public EnergyManagerControl() : base() { }
     }
     public class FroniusControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.Fronius;
-
         public FroniusControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public FroniusControl() : base() { }
     }
     public class NfcCodeTouchControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.NfcCodeTouch;
-
         public NfcCodeTouchControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public NfcCodeTouchControl() : base() { }
     }
     public class IntercomControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.Intercom;
-
         public IntercomControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+        public IntercomControl() : base() { }
     }
 }

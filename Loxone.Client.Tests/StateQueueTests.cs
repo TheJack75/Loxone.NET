@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="DeserializationTests.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -10,6 +10,7 @@
 
 namespace Loxone.Client.Tests
 {
+    using System;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -22,7 +23,7 @@ namespace Loxone.Client.Tests
             var emptyUuid = Uuid.Parse("00000000-0000-0000-0000-000000000000");
 
             var queue = new LoxoneStateQueue();
-            await queue.EnqueueAsync(new ValueState(emptyUuid, 2.0));
+            await queue.EnqueueAsync(new ValueState(emptyUuid, 2.0, DateTimeOffset.Now));
             Assert.IsTrue(queue.Count() == 1);
         }
 
@@ -32,7 +33,7 @@ namespace Loxone.Client.Tests
             var emptyUuid = Uuid.Parse("00000000-0000-0000-0000-000000000000");
 
             var queue = new LoxoneStateQueue();
-            await queue.EnqueueAsync(new ValueState(emptyUuid, 2.0));
+            await queue.EnqueueAsync(new ValueState(emptyUuid, 2.0, DateTimeOffset.Now));
 
             var item = await queue.TryDequeueAsync();
             Assert.IsNotNull(item);

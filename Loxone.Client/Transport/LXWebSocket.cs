@@ -153,7 +153,7 @@ namespace Loxone.Client.Transport
                     await ReceiveAtomicAsync(buffer, false, cancellationToken).ConfigureAwait(false);
                     var uuid = new Uuid(new ArraySegment<byte>(buffer.Array, 0, 16));
                     double value = BitConverter.ToDouble(buffer.Array, 16);
-                    _ = _stateQueue.EnqueueAsync(new ValueState(uuid, value));
+                    _ = _stateQueue.EnqueueAsync(new ValueState(uuid, value, DateTimeOffset.Now));
                     length -= 24;
                 }
             }
@@ -199,7 +199,7 @@ namespace Loxone.Client.Transport
                 text = LXClient.Encoding.GetString(        bytes, offset + 36, length);
                 length = 4 * ((length - 1) / 4 + 1);
             }
-            state = new TextState(control, icon, text);
+            state = new TextState(control, icon, text, DateTimeOffset.Now);
             int processed = 36 + length;
             offset += processed;
             return processed;

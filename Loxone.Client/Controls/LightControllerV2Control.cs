@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------
+﻿// ----------------------------------------------------------------------
 // <copyright file="StructureFile.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -8,19 +8,16 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Controls
 {
     using Loxone.Client.Transport;
 
-    public class ReadOnlyControl : LoxoneControlBase
+    public class LightControllerV2Control : LoxoneControlBase
     {
-        public ReadOnlyControl(ControlDTO controlDTO) : base(controlDTO)
+        public LightControllerV2Control(ControlDTO controlDTO) : base(controlDTO)
         {
         }
 
-        public ReadOnlyControl() : base(new ControlDTO())
-        {
-
-        }
+        public LightControllerV2Control() : base() { }
     }
 }

@@ -10,6 +10,7 @@
 
 namespace Loxone.Client.Controls
 {
+    using System;
     using System.Text.Json;
     using Loxone.Client.Transport;
 
@@ -17,16 +18,21 @@ namespace Loxone.Client.Controls
     {
         private DetailsTextDTO _detailsText;
 
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.PresenceDetector;
-
         public PresenceDetectorControl(ControlDTO controlDTO) : base(controlDTO)
         {
             _detailsText = JsonSerializer.Deserialize<DetailsTextDTO>(controlDTO.Details["text"].ToString());
         }
 
-        public string TextOn => _detailsText.On;
+        public PresenceDetectorControl() : base()
+        {
+            _detailsText = new DetailsTextDTO();
+            TextOn = _detailsText.On;
+            TextOff = _detailsText.Off;
+        }
 
-        public string TextOff => _detailsText.Off;
+        public string TextOn { get; set; }
+
+        public string TextOff { get; set; }
 
         public bool Active => GetStateValueAsBool("active");
 
@@ -35,6 +41,14 @@ namespace Loxone.Client.Controls
             get
             {
                 return (PresenceState)GetStateValueAs<int>("events");
+            }
+        }
+
+        public DateTimeOffset PresenceStateLastModified
+        {
+            get
+            {
+                return GetStateInfo("events").LastModified; 
             }
         }
     }

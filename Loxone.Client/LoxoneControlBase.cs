@@ -22,19 +22,20 @@ namespace Loxone.Client
     {
         private ControlDTO _controlDTO;
         [JsonConverter(typeof(UuidConverter))]
-        public Uuid Uuid => _controlDTO.Uuid;
-        public string Name => _controlDTO.Name;
-        public bool IsFavorite => _controlDTO.IsFavorite;
-        public Uuid? RoomId => _controlDTO.Room;
-        public Uuid? CategoryId => _controlDTO.Category;
-        public string ControlType => _controlDTO.ControlType;
-        public abstract ControlTypeEnum ControlTypeEnum { get; }
-        //[JsonConverter(typeof(UuidConverter))]
-        public IReadOnlyDictionary<string, Uuid> States { get; private set; }
-        public ControlsCollection SubControls { get; private set; }
-        public Dictionary<string, object> Details => _controlDTO.Details;
-        [JsonConverter(typeof(UuidAsDictionaryKeyConverter<object>))]
-        public Dictionary<Uuid, object> StateValues { get; set; } = new Dictionary<Uuid, object>();
+        public Uuid Uuid { get; set; }
+        public string Name { get; set; }
+        public bool IsFavorite { get; set; }
+        public Uuid? RoomId { get; set; }
+        public Uuid? CategoryId { get; set; }
+        public string ControlType { get; set; }
+        public ControlTypeEnum ControlTypeEnum => GetControlTypeEnum();
+        public int DefaultRating { get; set; }
+        public bool IsSecured { get; set; }
+        public IReadOnlyDictionary<string, Uuid> States { get; set; } = new Dictionary<string, Uuid>();
+        public ControlsCollection SubControls { get; set; } = new ControlsCollection();
+        public Dictionary<string, object> Details { get; set; }
+        [JsonConverter(typeof(UuidAsDictionaryKeyConverter<StateInfo>))]
+        public Dictionary<Uuid, StateInfo> StateValues { get; set; } = new Dictionary<Uuid, StateInfo>();
 
         public string RoomName { get; set; }
 
@@ -43,19 +44,31 @@ namespace Loxone.Client
         public LoxoneControlBase(ControlDTO controlDTO)
         {
             _controlDTO = controlDTO;
+            Uuid = _controlDTO.Uuid;
+            Name = _controlDTO.Name;
+            IsFavorite = controlDTO.IsFavorite;
+            RoomId = controlDTO.Room;
+            CategoryId = _controlDTO.Category;
+            ControlType = controlDTO.ControlType;
+            Details = controlDTO.Details;
+            DefaultRating = controlDTO.DefaultRating;
+            IsSecured = controlDTO.IsSecured;
+
             States = _controlDTO.States.ToDictionary(s => s.Key, s => Uuid.Parse(s.Value));
             SubControls = new ControlsCollection(_controlDTO.SubControls, new ControlFactory());
         }
 
+        public LoxoneControlBase(){}
+
         public void UpdateStateValue(ValueState valueState)
         {
-            StateValues[valueState.Control] = valueState.Value;
+            StateValues[valueState.Control] = new StateInfo(valueState.Value, DateTimeOffset.Now);
             StateValuesUpdated();
         }
 
         public void UpdateStateValue(TextState textState)
         {
-            StateValues[textState.Control] = textState.Text;
+            StateValues[textState.Control] = new StateInfo(textState.Text, DateTimeOffset.Now);
             StateValuesUpdated();
         }
 
@@ -72,8 +85,8 @@ namespace Loxone.Client
 
             try
             {
-                if (StateValues.TryGetValue(uuid, out object obj))
-                    return (T)Convert.ChangeType(obj, typeof(T));
+                if (StateValues.TryGetValue(uuid, out StateInfo info))
+                    return (T)Convert.ChangeType(info.Value, typeof(T));
             }
             catch { }
 
@@ -84,6 +97,33 @@ namespace Loxone.Client
         {
             var number = GetStateValueAs<short>(stateName);
             return number != 0;
+        }
+
+        protected StateInfo GetStateInfo(string stateName)
+        {
+            var uuid = States[stateName];
+            if (uuid == null)
+                return default;
+
+            try
+            {
+                if (StateValues.TryGetValue(uuid, out StateInfo info))
+                    return info;
+            }
+            catch { }
+
+            return default;
+        }
+
+        private ControlTypeEnum GetControlTypeEnum()
+        {
+            if (string.IsNullOrEmpty(ControlType))
+                return ControlTypeEnum.NotDefined;
+
+            if(Enum.TryParse(ControlType, out ControlTypeEnum result))
+                return result;
+
+            return ControlTypeEnum.NotDefined;
         }
 
         public override string ToString()

@@ -18,11 +18,11 @@ namespace Loxone.Client.Controls
         {
         }
 
+        public JalousieControl() : base() { }
+
         public bool GoingUp => GetStateValueAsBool("up");
         public bool GoingDown => GetStateValueAsBool("down");
         public int Position => GetStateValueAs<int>("position");
         public int TargetPosition => GetStateValueAs<int>("targetPosition");
-
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.Jalousie;
     }
 }

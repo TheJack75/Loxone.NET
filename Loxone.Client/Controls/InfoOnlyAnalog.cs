@@ -14,11 +14,11 @@ namespace Loxone.Client.Controls
 
     public class InfoOnlyAnalog : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.InfoOnlyAnalog;
-
         public InfoOnlyAnalog(ControlDTO controlDTO) : base(controlDTO)
         {
         }
+
+        public InfoOnlyAnalog() : base() { }
 
         public double Value
         {

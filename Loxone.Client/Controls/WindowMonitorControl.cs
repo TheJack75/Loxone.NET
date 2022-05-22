@@ -19,8 +19,6 @@ namespace Loxone.Client.Controls
 
     public class WindowMonitorControl : LoxoneControlBase
     {
-        public override ControlTypeEnum ControlTypeEnum => ControlTypeEnum.WindowMonitor;
-        
         public IReadOnlyList<WindowsDTO> Windows { get; private set; } = new List<WindowsDTO>();
         public ushort OpenCount => GetStateValueAs<ushort>("numOpen");
         public ushort ClosedCount => GetStateValueAs<ushort>("numClosed");
@@ -33,6 +31,11 @@ namespace Loxone.Client.Controls
         {
             var windowsJson = controlDTO.Details["windows"].ToString();
             Windows = JsonSerializer.Deserialize<List<WindowsDTO>>(windowsJson);
+        }
+
+        public WindowMonitorControl() : base()
+        {
+            Windows = new List<WindowsDTO>();
         }
 
         public override void StateValuesUpdated()

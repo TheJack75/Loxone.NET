@@ -11,7 +11,9 @@
 namespace Loxone.Client.Tests
 {
     using System;
+    using System.Linq;
     using System.Text.Json;
+    using Loxone.Client.Controls;
     using Loxone.Client.Transport;
     using Loxone.Client.Transport.Serialization.Responses;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -48,38 +50,74 @@ namespace Loxone.Client.Tests
         [TestMethod]
         public void SerializeReadOnlyControl()
         {
-            const string CATEGORY_UUID = "0b734138-036d-0334-ffff403fb0c34b9e";
-            const string ACTIVE_STATE_UUID = "991bed10-01f9-2b85-ffff5e20fb3695f6";
+            const string CONTROL_TYPE = "InfoOnlyDigital";
+            Uuid CONTROL_UUID = Uuid.Parse("991bed10-01f9-2b85-ffff5e20fb3695f6");
+            Uuid CATEGORY_UUID = Uuid.Parse("0b734138-036d-0334-ffff403fb0c34b9e");
+            Uuid ACTIVE_STATE_UUID = Uuid.Parse("991bed10-01f9-2b85-ffff5e20fb3695f6");
+            Uuid ROOM_UUID = Uuid.Parse("0b734138-038c-035e-ffff403fb0c34b9e");
+            const string CONTROL_NAME = "Test control";
+            const int DEFAULT_RATING = 2;
+            const string ROOM_NAME = "My room";
+            const string CATEGORY_NAME = "My category";
+            const bool IS_FAVORITE = true;
+            const bool IS_SECURED = true;
 
-            var control = new ReadOnlyControl(
+            var DetailsTextElement = JsonDocument.Parse(@"{
+					""off"": ""Uit"",
+					""on"": ""Aan""
+				}").RootElement;
+            var DetailsColorElement = JsonDocument.Parse(@"{
+                    ""off"": ""#E73246"",
+					""on"": ""#69C350""
+                }").RootElement;
+
+            var control = new InfoOnlyDigital(
                 new ControlDTO {
-                    Uuid = Uuid.Parse("991bed10-01f9-2b85-ffff5e20fb3695f6"),
-                    ControlType = "InfoOnlyDigital",
-                    Category = Uuid.Parse(CATEGORY_UUID),
-                    IsFavorite = true,
-                    Name = "Test control",
+                    Uuid = CONTROL_UUID,
+                    ControlType = CONTROL_TYPE,
+                    Category = CATEGORY_UUID,
+                    IsFavorite = IS_FAVORITE,
+                    DefaultRating = DEFAULT_RATING,
+                    IsSecured = IS_SECURED,
+                    Room = ROOM_UUID,
+                    Name = CONTROL_NAME,
+                    Details = new System.Collections.Generic.Dictionary<string, object> {
+                        { "jLockable", true },
+                        { "text",  DetailsTextElement },
+                        { "color", DetailsColorElement }
+                    },
                     States = new System.Collections.Generic.Dictionary<string, string>
                     {
-                        {"active", ACTIVE_STATE_UUID }
+                        {"active", ACTIVE_STATE_UUID.ToString() }
                     },
                 });
-            control.UpdateStateValue(new ValueState(Uuid.Parse(ACTIVE_STATE_UUID), 1));
+            control.RoomName = ROOM_NAME;
+            control.CategoryName = CATEGORY_NAME;
+            var valueState = new ValueState(ACTIVE_STATE_UUID, 5d, DateTimeOffset.Now);
+            control.UpdateStateValue(valueState);
 
             var json = JsonSerializer.Serialize(control);
             Assert.IsNotNull(json);
             Assert.IsTrue(json.StartsWith('{'));
-            var doc = JsonDocument.Parse(json);
-            var categoryProp = doc.RootElement.GetProperty("CategoryId");
-            Assert.AreEqual(categoryProp.GetString(), CATEGORY_UUID);
 
-            var valueStateProp = doc.RootElement.GetProperty("StateValues");
-            foreach(var item in valueStateProp.EnumerateObject())
-            {
-                Assert.AreEqual(item.Name, ACTIVE_STATE_UUID);
-                Assert.AreEqual(item.Value.GetInt32(), 1);
-                break;
-            }
-            //Assert.AreEqual(valueStateProp.GetString())
+            var deserializedControl = JsonSerializer.Deserialize<InfoOnlyDigital>(json);
+            Assert.IsNotNull(deserializedControl);
+            Assert.AreEqual(deserializedControl.CategoryId, CATEGORY_UUID);
+            Assert.AreEqual(deserializedControl.ControlType, "InfoOnlyDigital");
+            Assert.AreEqual(deserializedControl.StateValues.Count, 1);
+            var firstStateValue = deserializedControl.StateValues.First();
+            Assert.AreEqual(firstStateValue.Key, ACTIVE_STATE_UUID);
+            Assert.AreEqual(firstStateValue.Value.Value, 5d);
+            Assert.AreEqual(firstStateValue.Value.LastModified.ToString(), valueState.LastModified.ToString());
+            Assert.AreEqual(deserializedControl.RoomId, ROOM_UUID);
+            Assert.AreEqual(deserializedControl.Name, CONTROL_NAME);
+            Assert.AreEqual(deserializedControl.DefaultRating, DEFAULT_RATING);
+            Assert.AreEqual(deserializedControl.RoomName, ROOM_NAME);
+            Assert.AreEqual(deserializedControl.CategoryName, CATEGORY_NAME);
+            Assert.AreEqual(deserializedControl.IsFavorite, IS_FAVORITE);
+            Assert.AreEqual(deserializedControl.IsSecured, IS_SECURED);
+            Assert.AreEqual(deserializedControl.TextOff, "Uit");
+            Assert.AreEqual(deserializedControl.TextOn, "Aan");
         }
     }
 }

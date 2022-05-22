@@ -11,8 +11,6 @@
 namespace Loxone.Client.Transport.Serialization
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Text.Json;
     using System.Text.Json.Serialization;
 
@@ -25,46 +23,19 @@ namespace Loxone.Client.Transport.Serialization
             => writer.WriteStringValue(value.ToString());
     }
 
-    internal sealed class UuidAsDictionaryKeyConverter<TValue> : JsonConverter<IDictionary<Uuid, TValue>>
+    internal sealed class StateInfoConverter : JsonConverter<StateInfo>
     {
-        public override bool CanConvert(Type typeToConvert)
+        public override StateInfo Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            if (typeToConvert != typeof(Dictionary<Uuid, TValue>))
-            {
-                return false;
-            }
-            else if (typeToConvert.GenericTypeArguments.First() == typeof(string))
-            {
-                return false;
-            }
-            return true;
+            var stateInfoText = reader.GetString();
+
+            return StateInfo.Parse(stateInfoText);
         }
 
-        public override IDictionary<Uuid, TValue> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, StateInfo value, JsonSerializerOptions options)
         {
-            var dictionaryWithStringKey = (Dictionary<string, TValue>)JsonSerializer.Deserialize(ref reader, typeof(Dictionary<string, TValue>), options);
-
-
-            //Step 2 - Convert the dictionary to one that uses the actual key type we want
-            var dictionary = new Dictionary<Uuid, TValue>();
-
-            foreach (var kvp in dictionaryWithStringKey)
-            {
-                dictionary.Add(Uuid.Parse(kvp.Key), kvp.Value);
-            }
-
-            return dictionary;
-        }
-
-        public override void Write(Utf8JsonWriter writer, IDictionary<Uuid, TValue> value, JsonSerializerOptions options)
-        {
-            var dictionary = new Dictionary<string, TValue>(value.Count);
-
-            foreach (var kvp in value)
-            {
-                dictionary.Add(kvp.Key.ToString(), kvp.Value);
-            }
-            JsonSerializer.Serialize(writer, dictionary, options);
+            var v = value.ToString();
+            writer.WriteStringValue(v);
         }
     }
 }

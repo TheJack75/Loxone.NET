@@ -22,10 +22,14 @@ namespace Loxone.Client
 
         public double Value => _value;
 
-        public ValueState(Uuid control, double value)
+        private readonly DateTimeOffset _lastModified;
+        public DateTimeOffset LastModified => _lastModified;
+
+        public ValueState(Uuid control, double value, DateTimeOffset lastModified)
         {
             this._control = control;
             this._value = value;
+            _lastModified = lastModified;
         }
 
         public override string ToString()
