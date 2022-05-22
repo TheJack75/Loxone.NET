@@ -17,7 +17,12 @@ namespace Loxone.Client.Controls
     using Loxone.Client.Transport;
     using Loxone.Client.Transport.Serialization;
 
-    public class WindowMonitorControl : LoxoneControlBase
+    public interface INeedsRoomEnrichment
+    {
+        void EnrichRooms(RoomCollection rooms);
+    }
+
+    public class WindowMonitorControl : LoxoneControlBase, INeedsRoomEnrichment
     {
         public IReadOnlyList<WindowsDTO> Windows { get; private set; } = new List<WindowsDTO>();
         public ushort OpenCount => GetStateValueAs<ushort>("numOpen");
@@ -61,6 +66,14 @@ namespace Loxone.Client.Controls
             return $"{base.ToString()} - # windows = {Windows.Count} - open = {OpenCount} - closed = {ClosedCount}";
         }
 
+        public void EnrichRooms(RoomCollection rooms)
+        {
+            foreach(var window in Windows)
+            {
+                window.RoomName = rooms.GetRoomName(window.RoomId);
+            }
+        }
+
         public enum WindowState
         {
             Offline = 0,
@@ -77,9 +90,10 @@ namespace Loxone.Client.Controls
             [JsonPropertyName("installPlace")]
             public string InstallPlace { get; set; }
             [JsonPropertyName("room")]
-            [JsonConverter(typeof(UuidConverter))]
-            public Uuid Room { get; set; }
-            [JsonIgnore]
+            public Uuid RoomId { get; set; }
+            [JsonPropertyName("roomName")]
+            public string RoomName { get; set; }
+            [JsonPropertyName("state")]
             public WindowState State { get; set; }
         }
     }

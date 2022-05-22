@@ -14,14 +14,16 @@ namespace Loxone.Client
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
 
     public class LoxoneService : ILoxoneService
     {
         public event EventHandler<EventArgs> StructureFileChanged;
 
-        private IMiniserverConnection _connection;
-        private LoxoneConfig _config;
+        private readonly IMiniserverConnection _connection;
+        private readonly LoxoneConfig _config;
+        private readonly ILogger<LoxoneService> _logger;
         private StructureFile _structureFile;
 
         public StructureFile StructureFile
@@ -35,19 +37,20 @@ namespace Loxone.Client
             StructureFileChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public LoxoneService(IMiniserverConnection connection, IOptions<LoxoneConfig> configOptions)
+        public LoxoneService(IMiniserverConnection connection, IOptions<LoxoneConfig> configOptions, ILogger<LoxoneService> logger)
         {
             _connection = connection;
             _config = configOptions.Value;
+            _logger = logger;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             _connection.Credentials = new TokenCredential(_config.UserName, _config.Password, TokenPermission.Web, default, "Loxone.NET Sample Console");
 
-            Console.WriteLine($"Opening connection to miniserver at {_connection.Address}...");
+            _logger.LogInformation($"Opening connection to miniserver at {_connection.Address}...");
             await _connection.OpenAsync(cancellationToken);
-            Console.WriteLine($"Connected to Miniserver {_connection.MiniserverInfo.SerialNumber}, FW version {_connection.MiniserverInfo.FirmwareVersion}");
+            _logger.LogInformation($"Connected to Miniserver {_connection.MiniserverInfo.SerialNumber}, FW version {_connection.MiniserverInfo.FirmwareVersion}");
 
             // Load cached structure file or download a fresh one if the local file does not exist or is outdated.
             string structureFileName = $"LoxAPP3.{_connection.MiniserverInfo.SerialNumber}.json";
@@ -59,7 +62,7 @@ namespace Loxone.Client
                 if (lastModified > StructureFile.LastModified)
                 {
                     // Structure file cached locally is outdated, throw it away.
-                    Console.WriteLine("Cached structure file is outdated.");
+                    _logger.LogInformation("Cached structure file is outdated.");
                     StructureFile = null;
                 }
             }
@@ -68,26 +71,26 @@ namespace Loxone.Client
             {
                 // The structure file either did not exist on disk or was outdated. Download a fresh copy from
                 // miniserver right now.
-                Console.WriteLine("Downloading structure file...");
+                _logger.LogInformation("Downloading structure file...");
                 StructureFile = await _connection.DownloadStructureFileAsync(cancellationToken);
 
                 // Save it locally on disk.
                 await StructureFile.SaveAsync(structureFileName, cancellationToken);
             }
 
-            Console.WriteLine($"Structure file loaded.");
-            Console.WriteLine($"  Culture: {StructureFile.Localization.Culture}");
-            Console.WriteLine($"  Last modified: {StructureFile.LastModified}");
-            Console.WriteLine($"  Miniserver type: {StructureFile.MiniserverInfo.MiniserverType}");
+            _logger.LogInformation($"Structure file loaded.");
+            _logger.LogInformation($"  Culture: {StructureFile.Localization.Culture}");
+            _logger.LogInformation($"  Last modified: {StructureFile.LastModified}");
+            _logger.LogInformation($"  Miniserver type: {StructureFile.MiniserverInfo.MiniserverType}");
 
-            //Console.WriteLine($"Control types:");
+            //_logger.LogInformation($"Control types:");
             //var groupedControls = structureFile.Controls.GroupBy(c => c.ControlType).Distinct().Select(c => c.Key);
-            //Console.WriteLine(String.Join("\r\n", groupedControls));
+            //_logger.LogInformation(String.Join("\r\n", groupedControls));
 
-            Console.WriteLine("Enabling status updates...");
+            _logger.LogInformation("Enabling status updates...");
             await _connection.EnableStatusUpdatesAsync(cancellationToken);
 
-            Console.WriteLine("Status updates enabled, now receiving updates. Press Ctrl+C to quit.");
+            _logger.LogInformation("Status updates enabled, now receiving updates. Press Ctrl+C to quit.");
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

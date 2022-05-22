@@ -17,27 +17,30 @@ namespace Loxone.Client.Samples.Console
     using Loxone.Client.Commands;
     using Loxone.Client.Controls;
     using Microsoft.Extensions.Hosting;
+    using Microsoft.Extensions.Logging;
 
     public class LoxoneHost : IHostedService
     {
-        private ILoxoneService _service;
-        private ILoxoneStateProcessor _processor;
-        private IMiniserverConnection _connection;
+        private readonly ILoxoneService _service;
+        private readonly ILoxoneStateProcessor _processor;
+        private readonly IMiniserverConnection _connection;
+        private readonly ILogger<LoxoneHost> _logger;
 
-        public LoxoneHost(ILoxoneService service, ILoxoneStateProcessor processor, IMiniserverConnection connection)
+        public LoxoneHost(ILoxoneService service, ILoxoneStateProcessor processor, IMiniserverConnection connection, ILogger<LoxoneHost> logger)
         {
             _service = service;
             _service.StructureFileChanged += _service_StructureFileChanged;
             _processor = processor;
             _connection = connection;
+            _logger = logger;
         }
 
         private void _service_StructureFileChanged(object sender, EventArgs e)
         {
             if(_service.StructureFile == null)
-                Console.WriteLine("No structure file found");
+                _logger.LogInformation("No structure file found");
             else
-                Console.WriteLine("Structure file found!");
+                _logger.LogInformation("Structure file found!");
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -45,10 +48,10 @@ namespace Loxone.Client.Samples.Console
             await _processor.StartAsync(cancellationToken);
             _ = _service.StartAsync(cancellationToken);
 
-            Console.WriteLine("Press enter to give a pulse to the first light switch");
+            _logger.LogInformation("Press enter to give a pulse to the first light switch");
             Console.ReadLine();
 
-            Console.WriteLine("Switching on/off first light switch");
+            _logger.LogInformation("Switching on/off first light switch");
             var lightController = _service.StructureFile.Controls.FirstOrDefault(c => c is LightControllerV2Control) as LightControllerV2Control;
             if (lightController != null)
             {

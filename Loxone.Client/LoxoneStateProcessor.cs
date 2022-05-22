@@ -14,19 +14,22 @@ namespace Loxone.Client
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
 
     public class LoxoneStateProcessor : ILoxoneStateProcessor, IDisposable
     {
         private readonly ILoxoneStateQueue _queue;
         private readonly IEnumerable<ILoxoneStateChangeHandler> _handlers;
         private readonly Timer _timer;
+        private readonly ILogger<LoxoneStateProcessor> _logger;
         private bool _isRunning;
 
-        public LoxoneStateProcessor(ILoxoneStateQueue queue, IEnumerable<ILoxoneStateChangeHandler> handlers)
+        public LoxoneStateProcessor(ILoxoneStateQueue queue, IEnumerable<ILoxoneStateChangeHandler> handlers, ILogger<LoxoneStateProcessor> logger)
         {
             _queue = queue;
             _handlers = handlers;
             _timer = new Timer(ProcessStates, null, Timeout.Infinite, Timeout.Infinite);
+            _logger = logger;
         }
 
         public void Dispose()
@@ -67,7 +70,7 @@ namespace Loxone.Client
                         _ = Task.Run(() => handler.Handle(item.stateChange)).ContinueWith(t =>
                         {
                             if(t.IsFaulted)
-                                Console.WriteLine($"LoxoneStateProcessor: {t.Exception.ToString()}");
+                                _logger.LogInformation($"LoxoneStateProcessor: {t.Exception.ToString()}");
                         });
                 }
             }

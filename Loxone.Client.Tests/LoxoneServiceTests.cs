@@ -24,7 +24,7 @@ namespace Loxone.Client.Tests
         [TestInitialize]
         public async Task Initializations()
         {
-            _service = new LoxoneService(new MiniserverConnectionMock(new Uri("http://hello.world:999")), new OptionsMock());
+            _service = new LoxoneService(new MiniserverConnectionMock(new Uri("http://hello.world:999")), new OptionsMock(), new LoggingMock());
             await _service.StartAsync(new CancellationToken());
         }
 

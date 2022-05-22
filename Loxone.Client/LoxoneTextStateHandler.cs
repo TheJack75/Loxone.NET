@@ -11,14 +11,17 @@
 namespace Loxone.Client
 {
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
 
     public class LoxoneTextStateHandler : ILoxoneStateChangeHandler
     {
-        private ILoxoneService _service;
+        private readonly ILoxoneService _service;
+        private readonly ILogger<LoxoneTextStateHandler> _logger;
 
-        public LoxoneTextStateHandler(ILoxoneService service)
+        public LoxoneTextStateHandler(ILoxoneService service, ILogger<LoxoneTextStateHandler> logger)
         {
             _service = service;
+            _logger = logger;
         }
 
         public bool CanHandle(IStateChange stateChange)
@@ -33,10 +36,9 @@ namespace Loxone.Client
             if(control == null)
                 return Task.CompletedTask;
 
-            System.Console.WriteLine($"{state} -> {control}");
+            _logger.LogInformation($"{state} -> {control}");
             control.UpdateStateValue((TextState)state);
 
-            System.Console.WriteLine(state.ToString());
             return Task.CompletedTask;
         }
     }

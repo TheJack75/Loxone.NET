@@ -21,6 +21,9 @@ namespace Loxone.Client.Samples.Console
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Options;
+    using Microsoft.Extensions.Logging;
+    using Serilog.Extensions.Logging;
+    using Serilog;
 
     internal class Program
     {
@@ -34,6 +37,11 @@ namespace Loxone.Client.Samples.Console
             {
                 Console.WriteLine("Aborted.");
             };
+
+            Log.Logger = new LoggerConfiguration()
+              .Enrich.FromLogContext()
+              .WriteTo.Console()
+              .CreateLogger();
 
             var hostBuilder = CreateHostBuilder().Build();
 
@@ -62,7 +70,12 @@ namespace Loxone.Client.Samples.Console
                 .ConfigureServices((_, services) => services.AddSingleton<ILoxoneService, LoxoneService>())
                 .ConfigureServices((_, services) => services.AddTransient<ILoxoneStateChangeHandler, LoxoneValueStateHandler>())
                 .ConfigureServices((_, services) => services.AddTransient<ILoxoneStateChangeHandler, LoxoneTextStateHandler>())
-                .ConfigureServices((_, services) => services.AddTransient<ILoxoneStateProcessor, LoxoneStateProcessor>());
+                .ConfigureServices((_, services) => services.AddTransient<ILoxoneStateProcessor, LoxoneStateProcessor>())
+                .ConfigureLogging(logging =>
+                {
+                    logging.ClearProviders();
+                    logging.AddSerilog();
+                });
         }
     }
 }

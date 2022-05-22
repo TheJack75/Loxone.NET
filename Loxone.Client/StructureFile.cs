@@ -99,6 +99,9 @@ namespace Loxone.Client
 
             if(control.CategoryId != null)
                 control.CategoryName = _categories.GetCategoryName(control.CategoryId.Value);
+
+            if(control is INeedsRoomEnrichment roomEnrichment)
+                roomEnrichment.EnrichRooms(_rooms);
         }
 
         public static StructureFile Parse(string s)
