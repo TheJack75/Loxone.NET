@@ -57,7 +57,13 @@ namespace Loxone.Client.Controls
             var states = statesText.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             for(int i = 0; i < states.Length; i++)
             {
-                Windows[i].State = (WindowState)int.Parse(states[i]);
+                var oldState = Windows[i].State;
+                var newState = (WindowState)int.Parse(states[i]);
+
+                if (oldState != newState)
+                    Windows[i].LastModified = DateTimeOffset.Now;
+
+                Windows[i].State = newState;
             }
         }
 
@@ -95,6 +101,7 @@ namespace Loxone.Client.Controls
             public string RoomName { get; set; }
             [JsonPropertyName("state")]
             public WindowState State { get; set; }
+            public DateTimeOffset LastModified { get; internal set; }
         }
     }
 }
