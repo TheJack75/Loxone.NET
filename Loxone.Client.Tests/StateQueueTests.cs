@@ -12,6 +12,7 @@ namespace Loxone.Client.Tests
 {
     using System;
     using System.Threading.Tasks;
+    using Loxone.Client.Contracts;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]

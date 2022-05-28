@@ -17,6 +17,7 @@ namespace Loxone.Client.Transport
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using Loxone.Client.Contracts;
 
     internal sealed class LXWebSocket : LXClient
     {

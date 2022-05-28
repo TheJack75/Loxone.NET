@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="UuidConverter.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -15,6 +15,7 @@ namespace Loxone.Client.Transport.Serialization
     using System.Linq;
     using System.Text.Json;
     using System.Text.Json.Serialization;
+    using Loxone.Client.Contracts;
 
     internal sealed class UuidAsDictionaryKeyConverter<TValue> : JsonConverter<IDictionary<Uuid, TValue>>
     {

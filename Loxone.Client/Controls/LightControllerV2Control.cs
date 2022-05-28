@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="StructureFile.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -10,6 +10,7 @@
 
 namespace Loxone.Client.Controls
 {
+    using Loxone.Client.Contracts;
     using Loxone.Client.Transport;
 
     public class LightControllerV2Control : LoxoneControlBase

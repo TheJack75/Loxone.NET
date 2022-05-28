@@ -13,6 +13,7 @@ namespace Loxone.Client
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
+    using Loxone.Client.Contracts;
 
     public sealed class RoomCollection : IReadOnlyCollection<Room>
     {

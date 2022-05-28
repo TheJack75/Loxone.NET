@@ -12,6 +12,7 @@ namespace Loxone.Client.Transport
 {
     using System;
     using System.Security.Cryptography;
+    using Loxone.Client.Contracts;
 
     public static class MachineNameUuid
     {

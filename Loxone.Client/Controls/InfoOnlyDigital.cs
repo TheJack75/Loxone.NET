@@ -12,6 +12,7 @@ namespace Loxone.Client.Controls
 {
     using System.Text.Json;
     using System.Text.Json.Serialization;
+    using Loxone.Client.Contracts;
     using Loxone.Client.Transport;
 
     public class DetailsTextDTO

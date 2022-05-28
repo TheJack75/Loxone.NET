@@ -17,6 +17,7 @@ namespace Loxone.Client
     using Loxone.Client.Controls;
     using System.Text.Json.Serialization;
     using Loxone.Client.Transport.Serialization;
+    using Loxone.Client.Contracts;
 
     public abstract class LoxoneControlBase : ILoxoneControl
     {

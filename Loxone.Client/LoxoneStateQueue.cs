@@ -13,6 +13,7 @@ namespace Loxone.Client
     using System.Collections;
     using System.Collections.Concurrent;
     using System.Threading.Tasks;
+    using Loxone.Client.Contracts;
 
     public class LoxoneStateQueue : ILoxoneStateQueue
     {

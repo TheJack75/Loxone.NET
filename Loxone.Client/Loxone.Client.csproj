@@ -9,7 +9,7 @@
     <Authors>manison,TheJack</Authors>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <AssemblyVersion></AssemblyVersion>
-    <Version>1.0.14</Version>
+    <Version>1.1.0</Version>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
   <PropertyGroup>
@@ -21,6 +21,9 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="System.Text.Json" Version="6.0.3" />
     <PackageReference Include="DerConverter" Version="3.0.0.82" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Loxone.Client.Contracts\Loxone.Client.Contracts.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Strings.Designer.cs">

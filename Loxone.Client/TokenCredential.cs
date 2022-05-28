@@ -12,6 +12,7 @@ namespace Loxone.Client
 {
     using System;
     using System.Net;
+    using Loxone.Client.Contracts;
 
     public class TokenCredential : NetworkCredential
     {

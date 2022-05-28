@@ -8,7 +8,7 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Contracts
 {
     using System;
 
@@ -27,14 +27,14 @@ namespace Loxone.Client
 
         public ValueState(Uuid control, double value, DateTimeOffset lastModified)
         {
-            this._control = control;
-            this._value = value;
+            _control = control;
+            _value = value;
             _lastModified = lastModified;
         }
 
         public override string ToString()
         {
-            return String.Concat("value ", _control.ToString(), ": ", _value.ToString());
+            return string.Concat("value ", _control.ToString(), ": ", _value.ToString());
         }
     }
 }

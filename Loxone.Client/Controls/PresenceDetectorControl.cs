@@ -12,6 +12,7 @@ namespace Loxone.Client.Controls
 {
     using System;
     using System.Text.Json;
+    using Loxone.Client.Contracts;
     using Loxone.Client.Transport;
 
     public class PresenceDetectorControl : LoxoneControlBase

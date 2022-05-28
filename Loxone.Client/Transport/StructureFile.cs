@@ -14,6 +14,7 @@ namespace Loxone.Client.Transport
     using System.Collections.Generic;
     using System.Text.Json;
     using System.Text.Json.Serialization;
+    using Loxone.Client.Contracts;
 
     internal sealed class StructureFile
     {

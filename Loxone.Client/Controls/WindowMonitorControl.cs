@@ -14,8 +14,7 @@ namespace Loxone.Client.Controls
     using System.Collections.Generic;
     using System.Text.Json;
     using System.Text.Json.Serialization;
-    using Loxone.Client.Transport;
-    using Loxone.Client.Transport.Serialization;
+    using Loxone.Client.Contracts;
 
     public interface INeedsRoomEnrichment
     {

@@ -10,6 +10,7 @@
 
 namespace Loxone.Client.Controls
 {
+    using Loxone.Client.Contracts;
     using Loxone.Client.Transport;
 
     public class JalousieControl : LoxoneControlBase

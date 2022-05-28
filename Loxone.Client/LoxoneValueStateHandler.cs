@@ -11,6 +11,7 @@
 namespace Loxone.Client
 {
     using System.Threading.Tasks;
+    using Loxone.Client.Contracts;
     using Microsoft.Extensions.Logging;
 
     public class LoxoneValueStateHandler : ILoxoneStateChangeHandler

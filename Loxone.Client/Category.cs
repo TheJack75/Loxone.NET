@@ -13,6 +13,7 @@ namespace Loxone.Client
     using System;
     using System.Diagnostics.Contracts;
     using System.Drawing;
+    using Loxone.Client.Contracts;
 
     public sealed class Category : IEquatable<Category>
     {

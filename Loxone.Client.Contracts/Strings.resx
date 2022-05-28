@@ -117,19 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ColorConverter_InvalidFormat" xml:space="preserve">
-    <value>The color must be specified in format '#RRGGBB'.</value>
-  </data>
-  <data name="HexConverter_BadFormat" xml:space="preserve">
-    <value>Hex string format is invalid.</value>
-  </data>
-  <data name="MiniserverCommandException_MessageFmt" xml:space="preserve">
-    <value>Miniserver command failed with status code {0}.</value>
-  </data>
-  <data name="MiniserverConnection_MustBeSetBeforeOpenFmt" xml:space="preserve">
-    <value>Property '{0}' must be set before opening the connection.</value>
-  </data>
-  <data name="MiniserverTransportException_Message" xml:space="preserve">
-    <value>Message received from Miniserver has invalid format.</value>
+  <data name="Uuid_ArgMustBeUuid" xml:space="preserve">
+    <value>Argument must be of type Uuid.</value>
   </data>
 </root>

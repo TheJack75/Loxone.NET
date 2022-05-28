@@ -11,6 +11,7 @@
 namespace Loxone.Client.Controls
 {
     using System.Collections.Generic;
+    using Loxone.Client.Contracts;
     using Loxone.Client.Transport;
 
     public class ControlFactory : IControlFactory
@@ -89,5 +90,163 @@ namespace Loxone.Client.Controls
                     return new ReadOnlyControl(controlDTO);
             }
         }
+    }
+
+    public class AudioZoneV2Control : LoxoneControlBase
+    {
+        public AudioZoneV2Control(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+
+        public AudioZoneV2Control() : base() { }
+    }
+    public class RoomControllerV2Control : LoxoneControlBase
+    {
+        public RoomControllerV2Control(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+
+        public RoomControllerV2Control() : base() { }
+    }
+    public class CentralAudioZoneControl : LoxoneControlBase
+    {
+        public CentralAudioZoneControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public CentralAudioZoneControl() : base() { }
+    }
+    public class ClimateControllerControl : LoxoneControlBase
+    {
+        public ClimateControllerControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public ClimateControllerControl() : base() { }
+    }
+    public class LightSwitchControl : LoxoneControlBase
+    {
+        public LightSwitchControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public LightSwitchControl() : base() { }
+
+        public bool IsOn
+        {
+            get
+            {
+                return GetStateValueAsBool("active");
+            }
+        }
+    }
+    public class LoadManagerControl : LoxoneControlBase
+    {
+        public LoadManagerControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public LoadManagerControl() : base() { }
+    }
+    public class CentralLightControllerControl : LoxoneControlBase
+    {
+        public CentralLightControllerControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public CentralLightControllerControl() : base() { }
+    }
+    public class WebpageControl : LoxoneControlBase
+    {
+        public WebpageControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public WebpageControl() : base() { }
+    }
+    public class PulseAtControl : LoxoneControlBase
+    {
+        public PulseAtControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public PulseAtControl() : base() { }
+    }
+    public class AalSmartAlarmControl : LoxoneControlBase
+    {
+        public AalSmartAlarmControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public AalSmartAlarmControl() : base() { }
+    }
+    public class AlarmControl : LoxoneControlBase
+    {
+        public AlarmControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public AlarmControl() : base() { }
+    }
+    public class SmokeAlarmControl : LoxoneControlBase
+    {
+        public SmokeAlarmControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public SmokeAlarmControl() : base() { }
+    }
+    public class CentralJalousieControl : LoxoneControlBase
+    {
+        public CentralJalousieControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public CentralJalousieControl() : base() { }
+    }
+    public class AalEmergencyControl : LoxoneControlBase
+    {
+        public AalEmergencyControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public AalEmergencyControl() : base() { }
+    }
+    public class CarChargerControl : LoxoneControlBase
+    {
+        public CarChargerControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public CarChargerControl() : base() { }
+    }
+    public class RemoteControl : LoxoneControlBase
+    {
+        public RemoteControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public RemoteControl() : base() { }
+    }
+    public class AlarmClockControl : LoxoneControlBase
+    {
+        public AlarmClockControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public AlarmClockControl() : base() { }
+    }
+    public class EnergyManagerControl : LoxoneControlBase
+    {
+        public EnergyManagerControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public EnergyManagerControl() : base() { }
+    }
+    public class FroniusControl : LoxoneControlBase
+    {
+        public FroniusControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public FroniusControl() : base() { }
+    }
+    public class NfcCodeTouchControl : LoxoneControlBase
+    {
+        public NfcCodeTouchControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public NfcCodeTouchControl() : base() { }
+    }
+    public class IntercomControl : LoxoneControlBase
+    {
+        public IntercomControl(ControlDTO controlDTO) : base(controlDTO)
+        {
+        }
+        public IntercomControl() : base() { }
     }
 }

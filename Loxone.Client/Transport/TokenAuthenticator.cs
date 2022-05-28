@@ -15,6 +15,7 @@ namespace Loxone.Client.Transport
     using System.Security.Cryptography;
     using System.Threading;
     using System.Threading.Tasks;
+    using Loxone.Client.Contracts;
     using Loxone.Client.Transport.Serialization.Responses;
 
     internal sealed class TokenAuthenticator : Authenticator

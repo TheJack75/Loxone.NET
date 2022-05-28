@@ -8,7 +8,7 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Contracts
 {
     using System;
 
@@ -31,9 +31,9 @@ namespace Loxone.Client
 
         public TextState(Uuid control, Uuid icon, string text, DateTimeOffset lastModified)
         {
-            this._control = control;
-            this._icon = icon;
-            this._text = text ?? String.Empty;
+            _control = control;
+            _icon = icon;
+            _text = text ?? string.Empty;
             _lastModified = lastModified;
         }
 

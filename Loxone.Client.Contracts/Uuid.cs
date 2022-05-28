@@ -8,14 +8,13 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Contracts
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Runtime.Serialization;
     using System.Text.Json.Serialization;
-    using Loxone.Client.Transport.Serialization;
 
     /// <summary>
     /// Unique 128b identifier to identify controls, inputs and outputs.

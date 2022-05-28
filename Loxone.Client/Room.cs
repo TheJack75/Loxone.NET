@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="Room.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -12,6 +12,7 @@ namespace Loxone.Client
 {
     using System;
     using System.Diagnostics.Contracts;
+    using Loxone.Client.Contracts;
 
     public sealed class Room : IEquatable<Room>
     {

@@ -1,5 +1,5 @@
 // ----------------------------------------------------------------------
-// <copyright file="StructureFile.cs">
+// <copyright file="TextState.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
 // <license>
@@ -8,14 +8,10 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Contracts
 {
-    using System.Collections.Generic;
-    using Loxone.Client.Transport;
-
-    public interface IControlFactory
+    public interface IStateChange
     {
-        IReadOnlyDictionary<string, ILoxoneControl> Create(IDictionary<string, ControlDTO> controlDTOs);
-        ILoxoneControl Create(ControlDTO controlDTO);
+        Uuid Control { get; }
     }
 }

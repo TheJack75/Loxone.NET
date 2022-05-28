@@ -10,6 +10,7 @@
 
 namespace Loxone.Client
 {
+    using Loxone.Client.Contracts;
     using Loxone.Client.Transport;
 
     public class ReadOnlyControl : LoxoneControlBase

@@ -8,10 +8,9 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Contracts
 {
     using System.Collections.Generic;
-    using Loxone.Client.Controls;
 
     public interface ILoxoneControl
     {

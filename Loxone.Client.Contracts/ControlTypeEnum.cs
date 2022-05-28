@@ -8,7 +8,7 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Contracts
 {
     public enum ControlTypeEnum
     {

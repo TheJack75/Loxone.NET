@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Loxone.Client {
+namespace Loxone.Client.Contracts {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Loxone.Client {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Loxone.Client.Strings", typeof(Strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Loxone.Client.Contracts.Strings", typeof(Strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,47 +61,11 @@ namespace Loxone.Client {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The color must be specified in format &apos;#RRGGBB&apos;..
+        ///   Looks up a localized string similar to Argument must be of type Uuid..
         /// </summary>
-        internal static string ColorConverter_InvalidFormat {
+        internal static string Uuid_ArgMustBeUuid {
             get {
-                return ResourceManager.GetString("ColorConverter_InvalidFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Hex string format is invalid..
-        /// </summary>
-        internal static string HexConverter_BadFormat {
-            get {
-                return ResourceManager.GetString("HexConverter_BadFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Miniserver command failed with status code {0}..
-        /// </summary>
-        internal static string MiniserverCommandException_MessageFmt {
-            get {
-                return ResourceManager.GetString("MiniserverCommandException_MessageFmt", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Property &apos;{0}&apos; must be set before opening the connection..
-        /// </summary>
-        internal static string MiniserverConnection_MustBeSetBeforeOpenFmt {
-            get {
-                return ResourceManager.GetString("MiniserverConnection_MustBeSetBeforeOpenFmt", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Message received from Miniserver has invalid format..
-        /// </summary>
-        internal static string MiniserverTransportException_Message {
-            get {
-                return ResourceManager.GetString("MiniserverTransportException_Message", resourceCulture);
+                return ResourceManager.GetString("Uuid_ArgMustBeUuid", resourceCulture);
             }
         }
     }

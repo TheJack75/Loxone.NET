@@ -2,6 +2,7 @@ namespace Loxone.Client.Commands
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Loxone.Client.Contracts;
 
     public abstract class CommandBase
     {

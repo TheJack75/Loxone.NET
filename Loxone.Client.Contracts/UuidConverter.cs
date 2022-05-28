@@ -8,12 +8,11 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client.Transport.Serialization
+namespace Loxone.Client.Contracts
 {
     using System;
     using System.Text.Json;
     using System.Text.Json.Serialization;
-    using Loxone.Client.Contracts;
 
     internal sealed class UuidConverter : JsonConverter<Uuid>
     {

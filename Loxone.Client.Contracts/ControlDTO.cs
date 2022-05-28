@@ -8,7 +8,7 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client.Transport
+namespace Loxone.Client.Contracts
 {
     using System.Collections.Generic;
     using System.Text.Json;
