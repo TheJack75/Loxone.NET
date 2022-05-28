@@ -22,20 +22,4 @@ namespace Loxone.Client.Transport.Serialization
         public override void Write(Utf8JsonWriter writer, Uuid value, JsonSerializerOptions options)
             => writer.WriteStringValue(value.ToString());
     }
-
-    internal sealed class StateInfoConverter : JsonConverter<StateInfo>
-    {
-        public override StateInfo Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            var stateInfoText = reader.GetString();
-
-            return StateInfo.Parse(stateInfoText);
-        }
-
-        public override void Write(Utf8JsonWriter writer, StateInfo value, JsonSerializerOptions options)
-        {
-            var v = value.ToString();
-            writer.WriteStringValue(v);
-        }
-    }
 }
