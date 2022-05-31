@@ -11,6 +11,9 @@
 namespace Loxone.Client.Contracts
 {
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Text.Json;
+    using System.Text.Json.Serialization;
     using Loxone.Client.Contracts.Controls;
 
     public class ControlFactory : IControlFactory
@@ -107,10 +110,38 @@ namespace Loxone.Client.Contracts
     {
         public RoomControllerV2Control(ControlDTO controlDTO) : base(controlDTO)
         {
+            var timerModesText = controlDTO.Details["timerModes"].ToString();
+            TimerModes = JsonSerializer.Deserialize<RoomControllerTimerMode[]>(timerModesText).ToList();
+
+            Format = controlDTO.Details["format"].ToString();
         }
 
         public RoomControllerV2Control() : base() { }
+
+        public List<RoomControllerTimerMode> TimerModes { get; set; }
+
+        public string Format { get; set; }
+
+        public double ActualTemperature => GetStateValueAs<double>("tempActual");
+        public double TargetTemperature => GetStateValueAs<double>("tempTarget");
+        public double ComfortTemperature => GetStateValueAs<double>("comfortTemperature");
+        public double ComfortTemperatureCool => GetStateValueAs<double>("comfortTemperatureCool");
+        public double ActualOutdoorTemp => GetStateValueAs<double>("actualOutdoorTemp");
+        public double CurrentMode => GetStateValueAs<byte>("currentMode");
+        public double ActiveMode => GetStateValueAs<byte>("activeMode");
+        public double OpenWindow => GetStateValueAs<byte>("openWindow");
     }
+
+    public class RoomControllerTimerMode
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+        [JsonPropertyName("static")]
+        public bool IsStatic { get; set; }
+    }
+
     public class CentralAudioZoneControl : LoxoneControlBase
     {
         public CentralAudioZoneControl(ControlDTO controlDTO) : base(controlDTO)

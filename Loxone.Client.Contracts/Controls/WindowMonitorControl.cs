@@ -23,7 +23,7 @@ namespace Loxone.Client.Contracts.Controls
 
     public class WindowMonitorControl : LoxoneControlBase, INeedsRoomEnrichment
     {
-        public IReadOnlyList<WindowsDTO> Windows { get; private set; } = new List<WindowsDTO>();
+        public IReadOnlyList<WindowsDTO> Windows { get; set; } = new List<WindowsDTO>();
         public ushort OpenCount => GetStateValueAs<ushort>("numOpen");
         public ushort ClosedCount => GetStateValueAs<ushort>("numClosed");
         public ushort TiltedCount => GetStateValueAs<ushort>("numTilted");
