@@ -8,11 +8,10 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client.Controls
+namespace Loxone.Client.Contracts
 {
     using System.Collections.Generic;
-    using Loxone.Client.Contracts;
-    using Loxone.Client.Transport;
+    using Loxone.Client.Contracts.Controls;
 
     public class ControlFactory : IControlFactory
     {
@@ -86,6 +85,10 @@ namespace Loxone.Client.Controls
                     return new InfoOnlyAnalog(controlDTO);
                 case "InfoOnlyDigital":
                     return new InfoOnlyDigital(controlDTO);
+                case "ColorPickerV2":
+                    return new ColorPickerV2(controlDTO);
+                case "Dimmer":
+                    return new DimmerControl(controlDTO);
                 default:
                     return new ReadOnlyControl(controlDTO);
             }

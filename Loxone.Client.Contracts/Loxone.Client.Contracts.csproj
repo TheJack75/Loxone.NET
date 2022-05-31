@@ -6,6 +6,8 @@
     <Version>1.0.0</Version>
     <PackageTags>loxone</PackageTags>
     <PackageId>TheJack0.Loxone.NET.Contracts</PackageId>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>

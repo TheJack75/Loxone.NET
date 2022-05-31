@@ -8,14 +8,13 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client.Transport
+namespace Loxone.Client.Contracts
 {
     using System.Collections.Generic;
     using System.Text.Json;
     using System.Text.Json.Serialization;
-    using Loxone.Client.Contracts;
 
-    internal sealed class RoomDTO
+    public sealed class RoomDTO
     {
         public Uuid Uuid { get; set; }
 

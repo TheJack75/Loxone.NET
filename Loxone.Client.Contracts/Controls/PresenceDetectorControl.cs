@@ -8,12 +8,11 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client.Controls
+namespace Loxone.Client.Contracts.Controls
 {
     using System;
     using System.Text.Json;
     using Loxone.Client.Contracts;
-    using Loxone.Client.Transport;
 
     public class PresenceDetectorControl : LoxoneControlBase
     {
@@ -44,7 +43,7 @@ namespace Loxone.Client.Controls
         {
             get
             {
-                return GetStateInfo("events").LastModified; 
+                return GetStateInfo("events").LastModified;
             }
         }
     }

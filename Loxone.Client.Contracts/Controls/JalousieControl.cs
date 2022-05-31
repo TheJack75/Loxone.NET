@@ -8,20 +8,21 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Contracts.Controls
 {
     using Loxone.Client.Contracts;
-    using Loxone.Client.Transport;
 
-    public class ReadOnlyControl : LoxoneControlBase
+    public class JalousieControl : LoxoneControlBase
     {
-        public ReadOnlyControl(ControlDTO controlDTO) : base(controlDTO)
+        public JalousieControl(ControlDTO controlDTO) : base(controlDTO)
         {
         }
 
-        public ReadOnlyControl() : base(new ControlDTO())
-        {
+        public JalousieControl() : base() { }
 
-        }
+        public bool IsGoingUp => GetStateValueAsBool("up");
+        public bool IsGoingDown => GetStateValueAsBool("down");
+        public int Position => GetStateValueAs<int>("position");
+        public int TargetPosition => GetStateValueAs<int>("targetPosition");
     }
 }

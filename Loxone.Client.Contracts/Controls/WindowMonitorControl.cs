@@ -8,7 +8,7 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client.Controls
+namespace Loxone.Client.Contracts.Controls
 {
     using System;
     using System.Collections.Generic;
@@ -54,7 +54,7 @@ namespace Loxone.Client.Controls
                 return;
 
             var states = statesText.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            for(int i = 0; i < states.Length; i++)
+            for (int i = 0; i < states.Length; i++)
             {
                 var oldState = Windows[i].State;
                 var newState = (WindowState)int.Parse(states[i]);
@@ -73,7 +73,7 @@ namespace Loxone.Client.Controls
 
         public void EnrichRooms(RoomCollection rooms)
         {
-            foreach(var window in Windows)
+            foreach (var window in Windows)
             {
                 window.RoomName = rooms.GetRoomName(window.RoomId);
             }

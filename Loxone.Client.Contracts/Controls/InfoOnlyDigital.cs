@@ -8,12 +8,11 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client.Controls
+namespace Loxone.Client.Contracts.Controls
 {
     using System.Text.Json;
     using System.Text.Json.Serialization;
     using Loxone.Client.Contracts;
-    using Loxone.Client.Transport;
 
     public class DetailsTextDTO
     {
@@ -47,7 +46,7 @@ namespace Loxone.Client.Controls
             HexColorOff = _detailsColor.HexColorOff;
         }
 
-        public InfoOnlyDigital() : base(){}
+        public InfoOnlyDigital() : base() { }
 
         public bool Active => GetStateValueAsBool("active");
 

@@ -8,7 +8,7 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client.Controls
+namespace Loxone.Client.Contracts.Controls
 {
     public enum PresenceState
     {

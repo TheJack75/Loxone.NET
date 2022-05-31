@@ -14,7 +14,7 @@ namespace Loxone.Client.Tests
     using System.Linq;
     using System.Text.Json;
     using Loxone.Client.Contracts;
-    using Loxone.Client.Controls;
+    using Loxone.Client.Contracts.Controls;
     using Loxone.Client.Transport;
     using Loxone.Client.Transport.Serialization.Responses;
     using Microsoft.VisualStudio.TestTools.UnitTesting;

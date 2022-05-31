@@ -8,11 +8,10 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Contracts
 {
     using System;
     using System.Text.Json.Serialization;
-    using Loxone.Client.Transport.Serialization;
 
     [JsonConverter(typeof(StateInfoConverter))]
     public struct StateInfo
@@ -21,7 +20,7 @@ namespace Loxone.Client
         private readonly object _value;
         private readonly DateTimeOffset _lastModified;
 
-        public object Value  => _value;
+        public object Value => _value;
         public DateTimeOffset LastModified => _lastModified;
 
         public StateInfo(object value, DateTimeOffset lastModified)

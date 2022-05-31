@@ -1,10 +1,8 @@
 namespace Loxone.Client.Commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
     using System.Threading.Tasks;
-    using Loxone.Client.Controls;
+    using Loxone.Client;
+    using Loxone.Client.Contracts;
 
     public class SwitchPulseCommand : CommandBase
     {
@@ -26,16 +24,6 @@ namespace Loxone.Client.Commands
                 return $"{Control.Uuid}/off";
 
             return $"{Control.Uuid}/on";
-        }
-    }
-
-    public class CommandInvoker
-    {
-        public CommandBase Command { get; set; }
-
-        public async Task Execute()
-        {
-            await Command.ExecuteAsync();
         }
     }
 }

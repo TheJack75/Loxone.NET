@@ -15,7 +15,7 @@ namespace Loxone.Client.Samples.Console
     using System.Threading;
     using System.Threading.Tasks;
     using Loxone.Client.Commands;
-    using Loxone.Client.Controls;
+    using Loxone.Client.Contracts.Controls;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
 
@@ -48,6 +48,7 @@ namespace Loxone.Client.Samples.Console
             await _processor.StartAsync(cancellationToken);
             _ = _service.StartAsync(cancellationToken);
 
+            /* DO NOT REMOVE - example of using CommandInvoker
             _logger.LogInformation("Press enter to give a pulse to the first light switch");
             Console.ReadLine();
 
@@ -60,7 +61,28 @@ namespace Loxone.Client.Samples.Console
                 var command = new SwitchPulseCommand(lightSwitch, _connection);
                 invoker.Command = command;
                 await invoker.Execute();
+            }*/
+
+            _logger.LogInformation("Press enter list all available moods and the active moods of 'RGB legplanken zitkamer'");
+            Console.ReadLine();
+
+            _logger.LogInformation("Switching on/off first light switch");
+            var lightController = _service.StructureFile.Controls.FirstOrDefault(c => c is LightControllerV2Control && c.Name == "RGB legplanken zitkamer") as LightControllerV2Control;
+            _logger.LogWarning($"All moods:");
+            foreach (var mood in lightController.Moods)
+            {
+                _logger.LogWarning($"{mood.Id} - {mood.Name}");
             }
+
+            _logger.LogWarning($"Active moods:");
+            foreach (var mood in lightController.ActiveMoods)
+            {
+                _logger.LogWarning($"{mood.Id} - {mood.Name}");
+            }
+
+            var colorPicker = (ColorPickerV2)lightController.SubControls.First(c => c is ColorPickerV2);
+            var color = colorPicker.HsvColor;
+            //if(colorPicker)
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

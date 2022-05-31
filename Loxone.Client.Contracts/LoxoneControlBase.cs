@@ -8,16 +8,12 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Contracts
 {
     using System.Collections.Generic;
-    using Loxone.Client.Transport;
     using System.Linq;
     using System;
-    using Loxone.Client.Controls;
     using System.Text.Json.Serialization;
-    using Loxone.Client.Transport.Serialization;
-    using Loxone.Client.Contracts;
 
     public abstract class LoxoneControlBase : ILoxoneControl
     {
@@ -59,7 +55,7 @@ namespace Loxone.Client
             SubControls = new ControlsCollection(_controlDTO.SubControls, new ControlFactory());
         }
 
-        public LoxoneControlBase(){}
+        public LoxoneControlBase() { }
 
         public void UpdateStateValue(ValueState valueState)
         {
@@ -121,7 +117,7 @@ namespace Loxone.Client
             if (string.IsNullOrEmpty(ControlType))
                 return ControlTypeEnum.NotDefined;
 
-            if(Enum.TryParse(ControlType, out ControlTypeEnum result))
+            if (Enum.TryParse(ControlType, out ControlTypeEnum result))
                 return result;
 
             return ControlTypeEnum.NotDefined;

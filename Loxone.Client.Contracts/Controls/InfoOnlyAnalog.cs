@@ -8,17 +8,26 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client.Controls
+namespace Loxone.Client.Contracts.Controls
 {
     using Loxone.Client.Contracts;
-    using Loxone.Client.Transport;
 
-    public class LightControllerV2Control : LoxoneControlBase
+    public class InfoOnlyAnalog : LoxoneControlBase
     {
-        public LightControllerV2Control(ControlDTO controlDTO) : base(controlDTO)
+        public InfoOnlyAnalog(ControlDTO controlDTO) : base(controlDTO)
         {
         }
 
-        public LightControllerV2Control() : base() { }
+        public InfoOnlyAnalog() : base() { }
+
+        public double Value
+        {
+            get
+            {
+                return GetStateValueAs<double>("value");
+            }
+        }
+
+        public string Format => Details["format"].ToString();
     }
 }

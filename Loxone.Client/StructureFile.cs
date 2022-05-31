@@ -16,7 +16,7 @@ namespace Loxone.Client
     using System.Threading;
     using System.Threading.Tasks;
     using Loxone.Client.Contracts;
-    using Loxone.Client.Controls;
+    using Loxone.Client.Contracts.Controls;
 
     public sealed class StructureFile
     {

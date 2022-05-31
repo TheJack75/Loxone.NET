@@ -8,21 +8,20 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Contracts
 {
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
-    using Loxone.Client.Contracts;
 
     public sealed class RoomCollection : IReadOnlyCollection<Room>
     {
-        private readonly IDictionary<string, Transport.RoomDTO> _innerRooms;
+        private readonly IDictionary<string, RoomDTO> _innerRooms;
 
-        internal RoomCollection(IDictionary<string, Transport.RoomDTO> innerRooms)
+        public RoomCollection(IDictionary<string, RoomDTO> innerRooms)
         {
             Contract.Requires(innerRooms != null);
-            this._innerRooms = innerRooms;
+            _innerRooms = innerRooms;
         }
 
         public int Count => _innerRooms.Count;
@@ -37,7 +36,7 @@ namespace Loxone.Client
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.GetEnumerator();
+            return GetEnumerator();
         }
 
         public string GetRoomName(Uuid roomId)

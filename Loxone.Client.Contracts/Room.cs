@@ -8,24 +8,23 @@
 // </license>
 // ----------------------------------------------------------------------
 
-namespace Loxone.Client
+namespace Loxone.Client.Contracts
 {
     using System;
     using System.Diagnostics.Contracts;
-    using Loxone.Client.Contracts;
 
     public sealed class Room : IEquatable<Room>
     {
-        private Transport.RoomDTO _innerRoom;
+        private RoomDTO _innerRoom;
 
         public Uuid Uuid => _innerRoom.Uuid;
 
         public string Name => _innerRoom.Name;
 
-        internal Room(Transport.RoomDTO room)
+        internal Room(RoomDTO room)
         {
             Contract.Requires(room != null);
-            this._innerRoom = room;
+            _innerRoom = room;
         }
 
         public bool Equals(Room other)
@@ -35,7 +34,7 @@ namespace Loxone.Client
                 return false;
             }
 
-            return this.Uuid == other.Uuid;
+            return Uuid == other.Uuid;
         }
 
         public override bool Equals(object obj)
