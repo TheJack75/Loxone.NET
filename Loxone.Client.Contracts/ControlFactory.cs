@@ -130,6 +130,17 @@ namespace Loxone.Client.Contracts
         public double CurrentMode => GetStateValueAs<byte>("currentMode");
         public double ActiveMode => GetStateValueAs<byte>("activeMode");
         public double OpenWindow => GetStateValueAs<byte>("openWindow");
+        public RoomControllerOperatingMode OperatingMode => (RoomControllerOperatingMode)GetStateValueAs<int>("openWindow");
+    }
+
+    public enum RoomControllerOperatingMode
+    {
+        Automatic = 0,
+        AutomaticHeatingOnly = 1,
+        AutomaticCoolingOnly = 2,
+        Manual = 3,
+        ManualHeatingOnly = 4,
+        ManualCoolingOnly = 5
     }
 
     public class RoomControllerTimerMode

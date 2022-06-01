@@ -82,7 +82,6 @@ namespace Loxone.Client.Samples.Console
 
             var colorPicker = (ColorPickerV2)lightController.SubControls.First(c => c is ColorPickerV2);
             var color = colorPicker.HsvColor;
-            //if(colorPicker)
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
