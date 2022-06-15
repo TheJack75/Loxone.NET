@@ -15,16 +15,20 @@ namespace Loxone.Client.Contracts
 
     public sealed class Room : IEquatable<Room>
     {
-        private RoomDTO _innerRoom;
+        public Uuid Uuid { get; set; }
 
-        public Uuid Uuid => _innerRoom.Uuid;
+        public string Name { get; set; }
 
-        public string Name => _innerRoom.Name;
-
-        internal Room(RoomDTO room)
+        public Room(RoomDTO room)
         {
             Contract.Requires(room != null);
-            _innerRoom = room;
+            Uuid = room.Uuid;
+            Name = room.Name;
+        }
+
+        public Room()
+        {
+
         }
 
         public bool Equals(Room other)

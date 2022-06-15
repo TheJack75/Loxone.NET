@@ -19,9 +19,9 @@ namespace Loxone.Client.Commands
 
         protected async Task SendRequest()
         {
-            var response = await Connection.SendCommand(this, new CancellationToken()).ConfigureAwait(false);
+            _ = await Connection.SendCommand(this, new CancellationToken()).ConfigureAwait(false);
         }
 
-        public abstract string GetActionUri();
+        protected abstract string GetActionUri();
     }
 }

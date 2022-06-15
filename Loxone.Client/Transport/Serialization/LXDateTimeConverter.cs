@@ -12,26 +12,23 @@ namespace Loxone.Client.Transport.Serialization
 {
     using System;
     using System.Text.Json;
-    using System.Text.Json.Serialization;
+    using Newtonsoft.Json;
 
     internal sealed class LXDateTimeConverter : JsonConverter<DateTime>
     {
         private static readonly DateTime _epochStart = new DateTime(2009, 1, 1, 0, 0, 0, DateTimeKind.Local);
 
-        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => FromDouble(reader.GetDouble());
+        private static DateTime FromDouble(double d) => _epochStart.AddSeconds(d);
 
-        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+        public override void WriteJson(JsonWriter writer, DateTime value, Newtonsoft.Json.JsonSerializer serializer)
         {
-            var date = (DateTime)value;
-
-            // local Miniserver time
-            date = date.ToLocalTime();
+            var date = value.ToLocalTime();
 
             double d = date.Subtract(_epochStart).TotalSeconds;
-            writer.WriteNumberValue(d);
+            writer.WriteValue(d);
         }
 
-        private static DateTime FromDouble(double d) => _epochStart.AddSeconds(d);
+        public override DateTime ReadJson(JsonReader reader, Type objectType, DateTime existingValue, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
+            => FromDouble(double.Parse(reader.Value.ToString()));
     }
 }

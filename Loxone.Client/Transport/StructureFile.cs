@@ -13,24 +13,25 @@ namespace Loxone.Client.Transport
     using System;
     using System.Collections.Generic;
     using System.Text.Json;
-    using System.Text.Json.Serialization;
     using Loxone.Client.Contracts;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     internal sealed class StructureFile
     {
         public DateTime LastModified { get; set; }
 
-        [JsonPropertyName("msInfo")]
+        [JsonProperty("msInfo")]
         public MiniserverInfo MiniserverInfo { get; set; }
 
         public IDictionary<string, RoomDTO> Rooms { get; set; }
 
-        [JsonPropertyName("cats")]
+        [JsonProperty("cats")]
         public IDictionary<string, CategoryDTO> Categories { get; set; }
 
         public IDictionary<string, ControlDTO> Controls { get; set; }
 
         [JsonExtensionData]
-        public IDictionary<string, JsonElement> ExtensionData { get; set; }
+        public IDictionary<string, JToken> ExtensionData { get; set; }
     }
 }

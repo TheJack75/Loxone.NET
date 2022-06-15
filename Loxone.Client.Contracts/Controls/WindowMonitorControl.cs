@@ -15,6 +15,7 @@ namespace Loxone.Client.Contracts.Controls
     using System.Text.Json;
     using System.Text.Json.Serialization;
     using Loxone.Client.Contracts;
+    using Newtonsoft.Json;
 
     public interface INeedsRoomEnrichment
     {
@@ -34,7 +35,7 @@ namespace Loxone.Client.Contracts.Controls
         public WindowMonitorControl(ControlDTO controlDTO) : base(controlDTO)
         {
             var windowsJson = controlDTO.Details["windows"].ToString();
-            Windows = JsonSerializer.Deserialize<List<WindowsDTO>>(windowsJson);
+            Windows = JsonConvert.DeserializeObject<List<WindowsDTO>>(windowsJson);
         }
 
         public WindowMonitorControl() : base()
@@ -90,15 +91,15 @@ namespace Loxone.Client.Contracts.Controls
         }
         public class WindowsDTO
         {
-            [JsonPropertyName("name")]
+            [JsonProperty("name")]
             public string Name { get; set; }
-            [JsonPropertyName("installPlace")]
+            [JsonProperty("installPlace")]
             public string InstallPlace { get; set; }
-            [JsonPropertyName("room")]
+            [JsonProperty("room")]
             public Uuid RoomId { get; set; }
-            [JsonPropertyName("roomName")]
+            [JsonProperty("roomName")]
             public string RoomName { get; set; }
-            [JsonPropertyName("state")]
+            [JsonProperty("state")]
             public WindowState State { get; set; }
             public DateTimeOffset LastModified { get; internal set; }
         }

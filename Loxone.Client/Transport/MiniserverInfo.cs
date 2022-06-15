@@ -13,15 +13,16 @@ namespace Loxone.Client.Transport
     using System;
     using System.Collections.Generic;
     using System.Text.Json;
-    using System.Text.Json.Serialization;
     using Loxone.Client.Transport.Serialization;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     internal sealed class MiniserverInfo
     {
-        [JsonPropertyName("serialNr")]
+        [JsonProperty("serialNr")]
         public SerialNumber SerialNumber { get; set; }
 
-        [JsonPropertyName("msName")]
+        [JsonProperty("msName")]
         public string MiniserverName { get; set; }
 
         public string ProjectName { get; set; }
@@ -40,7 +41,7 @@ namespace Loxone.Client.Transport
         [JsonConverter(typeof(TimePeriodConverter))]
         public DateTime CoolPeriodEnd { get; set; }
 
-        [JsonPropertyName("catTitle")]
+        [JsonProperty("catTitle")]
         public string CategoryTitle { get; set; }
 
         public string RoomTitle { get; set; }
@@ -55,10 +56,10 @@ namespace Loxone.Client.Transport
 
         public string Currency { get; set; }
 
-        [JsonPropertyName("tempUnit")]
+        [JsonProperty("tempUnit")]
         public int TemperatureUnit { get; set; }
 
         [JsonExtensionData]
-        public IDictionary<string, JsonElement> ExtensionData { get; set; }
+        public IDictionary<string, JToken> ExtensionData { get; set; }
     }
 }

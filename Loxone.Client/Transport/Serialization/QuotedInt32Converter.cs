@@ -12,25 +12,24 @@ namespace Loxone.Client.Transport.Serialization
 {
     using System;
     using System.Globalization;
-    using System.Text.Json;
-    using System.Text.Json.Serialization;
+    using Newtonsoft.Json;
 
     /// <devdoc>
     /// https://github.com/dotnet/corefx/issues/39473
     /// </devdoc>
     internal sealed class QuotedInt32Converter : JsonConverter<int>
     {
-        public override int Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override int ReadJson(JsonReader reader, Type objectType, int existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            if (reader.TokenType == JsonTokenType.String)
+            if (reader.TokenType == JsonToken.String)
             {
-                return Int32.Parse(reader.GetString(), CultureInfo.InvariantCulture);
+                return int.Parse(reader.Value.ToString(), CultureInfo.InvariantCulture);
             }
 
-            return reader.GetInt32();
+            return int.Parse(reader.Value.ToString());
         }
 
-        public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options)
-            => writer.WriteStringValue(value.ToString(CultureInfo.InvariantCulture));
+        public override void WriteJson(JsonWriter writer, int value, JsonSerializer serializer)
+            => writer.WriteValue(value.ToString(CultureInfo.InvariantCulture));
     }
 }

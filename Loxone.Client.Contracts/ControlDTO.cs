@@ -11,17 +11,17 @@
 namespace Loxone.Client.Contracts
 {
     using System.Collections.Generic;
-    using System.Text.Json;
-    using System.Text.Json.Serialization;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     public sealed class ControlDTO
     {
-        [JsonPropertyName("uuidAction")]
+        [JsonProperty("uuidAction")]
         public Uuid Uuid { get; set; }
 
         public string Name { get; set; }
 
-        [JsonPropertyName("type")]
+        [JsonProperty("type")]
         public string ControlType { get; set; }
 
         public bool IsFavorite { get; set; }
@@ -32,19 +32,19 @@ namespace Loxone.Client.Contracts
 
         public Uuid? Room { get; set; }
 
-        [JsonPropertyName("cat")]
+        [JsonProperty("cat")]
         public Uuid? Category { get; set; }
 
-        [JsonPropertyName("details")]
+        [JsonProperty("details")]
         public Dictionary<string, object> Details { get; set; } = new Dictionary<string, object>();
 
-        [JsonPropertyName("states")]
+        [JsonProperty("states")]
         public Dictionary<string, string> States { get; set; } = new Dictionary<string, string>();
 
-        [JsonPropertyName("subControls")]
+        [JsonProperty("subControls")]
         public Dictionary<string, ControlDTO> SubControls { get; set; } = new Dictionary<string, ControlDTO>();
 
         [JsonExtensionData]
-        public IDictionary<string, JsonElement> ExtensionData { get; set; }
+        public IDictionary<string, JToken> ExtensionData { get; set; }
     }
 }

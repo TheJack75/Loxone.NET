@@ -13,8 +13,7 @@ namespace Loxone.Client.Contracts
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
-    using System.Runtime.Serialization;
-    using System.Text.Json.Serialization;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Unique 128b identifier to identify controls, inputs and outputs.
@@ -132,6 +131,7 @@ namespace Loxone.Client.Contracts
 
             return _uuid.Equals(other._uuid);
         }
+
 
         public override int GetHashCode()
         {

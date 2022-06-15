@@ -13,12 +13,13 @@ namespace Loxone.Client.Contracts.Controls
     using System.Text.Json;
     using System.Text.Json.Serialization;
     using Loxone.Client.Contracts;
+    using Newtonsoft.Json;
 
     public class DetailsTextDTO
     {
-        [JsonPropertyName("on")]
+        [JsonProperty("on")]
         public string On { get; set; }
-        [JsonPropertyName("off")]
+        [JsonProperty("off")]
         public string Off { get; set; }
     }
 
@@ -26,9 +27,9 @@ namespace Loxone.Client.Contracts.Controls
     {
         private class DetailsColorsDTO
         {
-            [JsonPropertyName("on")]
+            [JsonProperty("on")]
             public string HexColorOn { get; set; }
-            [JsonPropertyName("off")]
+            [JsonProperty("off")]
             public string HexColorOff { get; set; }
         }
 
@@ -37,11 +38,11 @@ namespace Loxone.Client.Contracts.Controls
 
         public InfoOnlyDigital(ControlDTO controlDTO) : base(controlDTO)
         {
-            _detailsText = JsonSerializer.Deserialize<DetailsTextDTO>(controlDTO.Details["text"].ToString());
+            _detailsText = JsonConvert.DeserializeObject<DetailsTextDTO>(controlDTO.Details["text"].ToString());
             TextOn = _detailsText.On;
             TextOff = _detailsText.Off;
 
-            _detailsColor = JsonSerializer.Deserialize<DetailsColorsDTO>(controlDTO.Details["color"].ToString());
+            _detailsColor = JsonConvert.DeserializeObject<DetailsColorsDTO>(controlDTO.Details["color"].ToString());
             HexColorOn = _detailsColor.HexColorOn;
             HexColorOff = _detailsColor.HexColorOff;
         }

@@ -3,13 +3,13 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>TheJack0.Loxone.NET</PackageId>
     <Description>Allows connecting to Loxone Miniserver from .NET application.</Description>
-    <PackageVersion>1.4.0</PackageVersion>
+    <PackageVersion>1.5.6</PackageVersion>
     <NeutralLanguage>en</NeutralLanguage>
     <Product>TheJack0.Loxone.NET</Product>
     <Authors>manison,TheJack</Authors>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <AssemblyVersion></AssemblyVersion>
-    <Version>1.4.0</Version>
+    <Version>1.5.5</Version>
     <AssemblyName>$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
   <PropertyGroup>
@@ -19,6 +19,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Text.Json" Version="6.0.3" />
     <PackageReference Include="DerConverter" Version="3.0.0.82" />
   </ItemGroup>

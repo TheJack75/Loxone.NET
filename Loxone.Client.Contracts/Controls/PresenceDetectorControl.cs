@@ -11,14 +11,14 @@
 namespace Loxone.Client.Contracts.Controls
 {
     using System;
-    using System.Text.Json;
     using Loxone.Client.Contracts;
+    using Newtonsoft.Json;
 
     public class PresenceDetectorControl : LoxoneControlBase
     {
         public PresenceDetectorControl(ControlDTO controlDTO) : base(controlDTO)
         {
-            var detailsText = JsonSerializer.Deserialize<DetailsTextDTO>(controlDTO.Details["text"].ToString());
+            var detailsText = JsonConvert.DeserializeObject<DetailsTextDTO>(controlDTO.Details["text"].ToString());
             TextOn = detailsText.On;
             TextOff = detailsText.Off;
         }

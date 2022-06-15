@@ -46,51 +46,60 @@ namespace Loxone.Client
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _connection.Credentials = new TokenCredential(_config.UserName, _config.Password, TokenPermission.Web, default, "Loxone.NET Sample Console");
-
-            _logger.LogInformation($"Opening connection to miniserver at {_connection.Address}...");
-            await _connection.OpenAsync(cancellationToken);
-            _logger.LogInformation($"Connected to Miniserver {_connection.MiniserverInfo.SerialNumber}, FW version {_connection.MiniserverInfo.FirmwareVersion}");
-
-            // Load cached structure file or download a fresh one if the local file does not exist or is outdated.
-            string structureFileName = $"LoxAPP3.{_connection.MiniserverInfo.SerialNumber}.json";
-            StructureFile = null;
-            if (File.Exists(structureFileName))
+            try
             {
-                StructureFile = await StructureFile.LoadAsync(structureFileName, cancellationToken);
-                var lastModified = await _connection.GetStructureFileLastModifiedDateAsync(cancellationToken);
-                if (lastModified > StructureFile.LastModified)
+
+                _connection.Credentials = new TokenCredential(_config.UserName, _config.Password, TokenPermission.Web, default, "Loxone.NET Sample Console");
+
+                _logger.LogInformation($"Opening connection to miniserver at {_connection.Address}...");
+                await _connection.OpenAsync(cancellationToken);
+                _logger.LogInformation($"Connected to Miniserver {_connection.MiniserverInfo.SerialNumber}, FW version {_connection.MiniserverInfo.FirmwareVersion}");
+
+                // Load cached structure file or download a fresh one if the local file does not exist or is outdated.
+                string structureFileName = $"LoxAPP3.{_connection.MiniserverInfo.SerialNumber}.json";
+                StructureFile = null;
+                if (File.Exists(structureFileName))
                 {
-                    // Structure file cached locally is outdated, throw it away.
-                    _logger.LogInformation("Cached structure file is outdated.");
-                    StructureFile = null;
+                    StructureFile = await StructureFile.LoadAsync(structureFileName, cancellationToken);
+                    var lastModified = await _connection.GetStructureFileLastModifiedDateAsync(cancellationToken);
+                    if (lastModified > StructureFile.LastModified)
+                    {
+                        // Structure file cached locally is outdated, throw it away.
+                        _logger.LogInformation("Cached structure file is outdated.");
+                        StructureFile = null;
+                    }
                 }
-            }
 
-            if (StructureFile == null)
+                if (StructureFile == null)
+                {
+                    // The structure file either did not exist on disk or was outdated. Download a fresh copy from
+                    // miniserver right now.
+                    _logger.LogInformation("Downloading structure file...");
+                    StructureFile = await _connection.DownloadStructureFileAsync(cancellationToken);
+
+                    // Save it locally on disk.
+                    await StructureFile.SaveAsync(structureFileName, cancellationToken);
+                }
+
+                _logger.LogInformation($"Structure file loaded.");
+                _logger.LogInformation($"  Culture: {StructureFile.Localization.Culture}");
+                _logger.LogInformation($"  Last modified: {StructureFile.LastModified}");
+                _logger.LogInformation($"  Miniserver type: {StructureFile.MiniserverInfo.MiniserverType}");
+
+                //_logger.LogInformation($"Control types:");
+                //var groupedControls = structureFile.Controls.GroupBy(c => c.ControlType).Distinct().Select(c => c.Key);
+                //_logger.LogInformation(String.Join("\r\n", groupedControls));
+
+                _logger.LogInformation("Enabling status updates...");
+                await _connection.EnableStatusUpdatesAsync(cancellationToken);
+
+                _logger.LogInformation("Status updates enabled, now receiving updates. Press Ctrl+C to quit.");
+
+            }
+            catch (Exception ex)
             {
-                // The structure file either did not exist on disk or was outdated. Download a fresh copy from
-                // miniserver right now.
-                _logger.LogInformation("Downloading structure file...");
-                StructureFile = await _connection.DownloadStructureFileAsync(cancellationToken);
 
-                // Save it locally on disk.
-                await StructureFile.SaveAsync(structureFileName, cancellationToken);
             }
-
-            _logger.LogInformation($"Structure file loaded.");
-            _logger.LogInformation($"  Culture: {StructureFile.Localization.Culture}");
-            _logger.LogInformation($"  Last modified: {StructureFile.LastModified}");
-            _logger.LogInformation($"  Miniserver type: {StructureFile.MiniserverInfo.MiniserverType}");
-
-            //_logger.LogInformation($"Control types:");
-            //var groupedControls = structureFile.Controls.GroupBy(c => c.ControlType).Distinct().Select(c => c.Key);
-            //_logger.LogInformation(String.Join("\r\n", groupedControls));
-
-            _logger.LogInformation("Enabling status updates...");
-            await _connection.EnableStatusUpdatesAsync(cancellationToken);
-
-            _logger.LogInformation("Status updates enabled, now receiving updates. Press Ctrl+C to quit.");
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

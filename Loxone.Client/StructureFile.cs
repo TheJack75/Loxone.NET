@@ -22,63 +22,37 @@ namespace Loxone.Client
     {
         private Transport.StructureFile _innerFile;
 
-        public DateTime LastModified
-        {
-            get
-            {
-                // Structure file uses local time (miniserver based).
-                return DateTime.SpecifyKind(_innerFile.LastModified, DateTimeKind.Local);
-            }
-        }
+        public DateTime LastModified { get; set; }
 
-        private MiniserverInfo _miniserverInfo;
+        public MiniserverInfo MiniserverInfo { get; set; }
 
-        public MiniserverInfo MiniserverInfo => _miniserverInfo;
+        public ProjectInfo Project { get; set; }
 
-        private ProjectInfo _project;
+        public LocalizationInfo Localization { get; set; }
+        
+        public RoomCollection Rooms { get; set; }
 
-        public ProjectInfo Project => _project;
+        public CategoryCollection Categories { get; set; }
 
-        private LocalizationInfo _localization;
+        public ControlsCollection Controls { get; set; }
 
-        public LocalizationInfo Localization => _localization;
-
-        private RoomCollection _rooms;
-
-        public RoomCollection Rooms
-        {
-            get
-            {
-                return _rooms;
-            }
-        }
-
-        private CategoryCollection _categories;
-
-        public CategoryCollection Categories
-        {
-            get
-            {
-                return _categories;
-            }
-        }
-
-        private ControlsCollection _controls;
-
-        public ControlsCollection Controls => _controls;
+        public StructureFile(){}
 
         private StructureFile(Transport.StructureFile innerFile)
         {
             Contract.Requires(innerFile != null);
             _innerFile = innerFile;
-            _miniserverInfo = new MiniserverInfo(_innerFile.MiniserverInfo);
-            _project = new ProjectInfo(_innerFile.MiniserverInfo);
-            _localization = new LocalizationInfo(_innerFile.MiniserverInfo);
-            _categories = new CategoryCollection(_innerFile.Categories);
-            _rooms = new RoomCollection(_innerFile.Rooms);
-            _controls = new ControlsCollection(_innerFile.Controls, new ControlFactory());
+            MiniserverInfo = new MiniserverInfo(_innerFile.MiniserverInfo);
+            Project = new ProjectInfo(_innerFile.MiniserverInfo);
+            Localization = new LocalizationInfo(_innerFile.MiniserverInfo);
+            Categories = new CategoryCollection(_innerFile.Categories);
+            Rooms = new RoomCollection(_innerFile.Rooms);
+            Controls = new ControlsCollection(_innerFile.Controls, new ControlFactory());
 
-            EnrichControls(_controls);
+            // Structure file uses local time (miniserver based).
+            LastModified = DateTime.SpecifyKind(_innerFile.LastModified, DateTimeKind.Local);
+
+            EnrichControls(Controls);
         }
 
         private void EnrichControls(ControlsCollection controls)
@@ -95,14 +69,14 @@ namespace Loxone.Client
             if (control == null)
                 return;
 
-            if(control.RoomId != null)
-                control.RoomName = _rooms.GetRoomName(control.RoomId.Value);
+            if (control.RoomId != null)
+                control.RoomName = Rooms.GetRoomName(control.RoomId.Value);
 
-            if(control.CategoryId != null)
-                control.CategoryName = _categories.GetCategoryName(control.CategoryId.Value);
+            if (control.CategoryId != null)
+                control.CategoryName = Categories.GetCategoryName(control.CategoryId.Value);
 
-            if(control is INeedsRoomEnrichment roomEnrichment)
-                roomEnrichment.EnrichRooms(_rooms);
+            if (control is INeedsRoomEnrichment roomEnrichment)
+                roomEnrichment.EnrichRooms(Rooms);
         }
 
         public static StructureFile Parse(string s)
@@ -113,28 +87,31 @@ namespace Loxone.Client
 
         public static async Task<StructureFile> LoadAsync(string fileName, CancellationToken cancellationToken)
         {
-            using (var file = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+            
+            using (var streamReader = File.OpenText(fileName))
             {
-                return await LoadAsync(file, cancellationToken).ConfigureAwait(false);
+                return await LoadAsync(streamReader, cancellationToken).ConfigureAwait(false);
             }
         }
 
-        public static async Task<StructureFile> LoadAsync(Stream stream, CancellationToken cancellationToken)
+        public static async Task<StructureFile> LoadAsync(StreamReader stream, CancellationToken cancellationToken)
         {
             var transportFile = await Transport.Serialization.SerializationHelper.DeserializeAsync<Transport.StructureFile>(
-                stream, cancellationToken).ConfigureAwait(false);
+                stream).ConfigureAwait(false);
             return new StructureFile(transportFile);
         }
 
         public async Task SaveAsync(string fileName, CancellationToken cancellationToken)
         {
-            using (var file = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+            
+            using (var stream = File.CreateText(fileName))
             {
-                await SaveAsync(file, cancellationToken).ConfigureAwait(false);
+                await SaveAsync(stream, cancellationToken).ConfigureAwait(false);
             }
         }
 
-        public Task SaveAsync(Stream stream, CancellationToken cancellationToken)
-            => Transport.Serialization.SerializationHelper.SerializeAsync(stream, _innerFile, cancellationToken);
+
+        public Task SaveAsync(StreamWriter stream, CancellationToken cancellationToken)
+            => Transport.Serialization.SerializationHelper.SerializeAsync(stream, _innerFile);
     }
 }

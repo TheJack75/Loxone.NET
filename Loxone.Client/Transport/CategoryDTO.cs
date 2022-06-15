@@ -15,6 +15,7 @@ namespace Loxone.Client.Transport
     using System.Text.Json;
     using System.Text.Json.Serialization;
     using Loxone.Client.Contracts;
+    using Newtonsoft.Json.Linq;
 
     internal sealed class CategoryDTO
     {
@@ -29,6 +30,6 @@ namespace Loxone.Client.Transport
         public Color Color { get; set; }
 
         [JsonExtensionData]
-        public IDictionary<string, JsonElement> ExtensionData { get; set; }
+        public IDictionary<string, JToken> ExtensionData { get; set; }
     }
 }

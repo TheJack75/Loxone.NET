@@ -15,7 +15,9 @@ namespace Loxone.Client.Contracts
     using System.Linq;
     using System.Text.Json;
     using System.Text.Json.Serialization;
+    using Newtonsoft.Json;
 
+    /*
     internal sealed class UuidAsDictionaryKeyConverter<TValue> : JsonConverter<IDictionary<Uuid, TValue>>
     {
         public override bool CanConvert(Type typeToConvert)
@@ -33,7 +35,7 @@ namespace Loxone.Client.Contracts
 
         public override IDictionary<Uuid, TValue> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var dictionaryWithStringKey = (Dictionary<string, TValue>)JsonSerializer.Deserialize(ref reader, typeof(Dictionary<string, TValue>), options);
+            var dictionaryWithStringKey = (Dictionary<string, TValue>)JsonConvert.DeserializeObject(ref reader, typeof(Dictionary<string, TValue>), options);
 
             var dictionary = new Dictionary<Uuid, TValue>();
 
@@ -55,5 +57,5 @@ namespace Loxone.Client.Contracts
             }
             JsonSerializer.Serialize(writer, dictionary, options);
         }
-    }
+    }*/
 }

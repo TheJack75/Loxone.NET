@@ -12,8 +12,7 @@ namespace Loxone.Client.Transport.Serialization
 {
     using System;
     using System.Globalization;
-    using System.Text.Json;
-    using System.Text.Json.Serialization;
+    using Newtonsoft.Json;
 
     internal class FormattedDateTimeConverter : JsonConverter<DateTime>
     {
@@ -24,10 +23,10 @@ namespace Loxone.Client.Transport.Serialization
             this._format = format;
         }
 
-        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => DateTime.ParseExact(reader.GetString(), _format, CultureInfo.InvariantCulture);
+        public override DateTime ReadJson(JsonReader reader, Type objectType, DateTime existingValue, bool hasExistingValue, JsonSerializer serializer)
+            => DateTime.ParseExact(reader.Value.ToString(), _format, CultureInfo.InvariantCulture);
 
-        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
-            => writer.WriteStringValue(value.ToString(_format, CultureInfo.InvariantCulture));
+        public override void WriteJson(JsonWriter writer, DateTime value, JsonSerializer serializer)
+            => writer.WriteValue(value.ToString(_format, CultureInfo.InvariantCulture));
     }
 }

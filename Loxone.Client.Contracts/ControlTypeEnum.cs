@@ -39,6 +39,7 @@ namespace Loxone.Client.Contracts
         NfcCodeTouch,
         Intercom,
         InfoOnlyAnalog,
-        InfoOnlyDigital
+        InfoOnlyDigital,
+        Dimmer
     }
 }

@@ -11,13 +11,14 @@
 namespace Loxone.Client.Transport.Serialization.Responses
 {
     using System;
-    using System.Text.Json.Serialization;
+    using Newtonsoft.Json;
 
     internal sealed class Api
     {
-        [JsonPropertyName("snr")]
+        [JsonProperty("snr")]
         public SerialNumber SerialNumber { get; set; }
 
+        [JsonProperty("version")]
         public Version Version { get; set; }
     }
 }

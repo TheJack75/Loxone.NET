@@ -15,16 +15,24 @@ namespace Loxone.Client.Contracts
     using System.Text.Json;
     using System.Text.Json.Serialization;
     using Loxone.Client.Contracts.Controls;
+    using Newtonsoft.Json;
 
     public class ControlFactory : IControlFactory
     {
-        public IReadOnlyDictionary<string, ILoxoneControl> Create(IDictionary<string, ControlDTO> controlDTOs)
+        public IEnumerable<ILoxoneControl> Create(IEnumerable<ControlDTO> controlDTOs)
         {
-            var result = new Dictionary<string, ILoxoneControl>();
+            var result = new List<ILoxoneControl>();
 
-            foreach (var pair in controlDTOs)
+            foreach (var control in controlDTOs)
             {
-                result.Add(pair.Key, Create(pair.Value));
+                try
+                {
+                    result.Add(Create(control));
+                }
+                catch (System.Exception ex)
+                {
+                }
+                
             }
 
             return result;
@@ -111,7 +119,7 @@ namespace Loxone.Client.Contracts
         public RoomControllerV2Control(ControlDTO controlDTO) : base(controlDTO)
         {
             var timerModesText = controlDTO.Details["timerModes"].ToString();
-            TimerModes = JsonSerializer.Deserialize<RoomControllerTimerMode[]>(timerModesText).ToList();
+            TimerModes = JsonConvert.DeserializeObject<RoomControllerTimerMode[]>(timerModesText).ToList();
 
             Format = controlDTO.Details["format"].ToString();
         }
@@ -145,11 +153,11 @@ namespace Loxone.Client.Contracts
 
     public class RoomControllerTimerMode
     {
-        [JsonPropertyName("name")]
+        [JsonProperty("name")]
         public string Name { get; set; }
-        [JsonPropertyName("id")]
+        [JsonProperty("id")]
         public int Id { get; set; }
-        [JsonPropertyName("static")]
+        [JsonProperty("static")]
         public bool IsStatic { get; set; }
     }
 

@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="StructureFile.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -16,6 +16,6 @@ namespace Loxone.Client
     public interface ILoxoneStateChangeHandler
     {
         Task Handle(IStateChange state);
-        bool CanHandle(IStateChange stateChange);
+        Task<bool> CanHandle(IStateChange stateChange);
     }
 }

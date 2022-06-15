@@ -17,19 +17,23 @@ namespace Loxone.Client
 
     public sealed class Category : IEquatable<Category>
     {
-        private Transport.CategoryDTO _innerCategory;
-
-        public Uuid Uuid => _innerCategory.Uuid;
-
-        public string Name => _innerCategory.Name;
-
-        // There should be support for Color type in .NET Standard 1.7
-        public Color Color => _innerCategory.Color;
+        public Uuid Uuid { get; set; }
+        public string Name { get; set; }
+        public Color Color { get; set; }
+        public bool IsFavorite { get; set; }
 
         internal Category(Transport.CategoryDTO category)
         {
             Contract.Requires(category != null);
-            this._innerCategory = category;
+            Uuid = category.Uuid;
+            Name = category.Name;
+            Color = category.Color;
+            IsFavorite = category.IsFavorite;
+        }
+
+        public Category()
+        {
+
         }
 
         public bool Equals(Category other)

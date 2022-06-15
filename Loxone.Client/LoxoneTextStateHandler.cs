@@ -25,22 +25,22 @@ namespace Loxone.Client
             _logger = logger;
         }
 
-        public bool CanHandle(IStateChange stateChange)
+        public async Task<bool> CanHandle(IStateChange stateChange)
         {
             return stateChange is TextState;
         }
 
-        public Task Handle(IStateChange state)
+        public async Task Handle(IStateChange state)
         {
             var control = _service.StructureFile.Controls.FindByStateUuid(state.Control);
 
             if(control == null)
-                return Task.CompletedTask;
+                return;
 
             _logger.LogInformation($"{state} -> {control}");
             control.UpdateStateValue((TextState)state);
 
-            return Task.CompletedTask;
+            return;
         }
     }
 }

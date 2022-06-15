@@ -10,6 +10,7 @@
 
 namespace Loxone.Client.Contracts
 {
+    using System;
     using System.Collections.Generic;
 
     public interface ILoxoneControl
@@ -27,5 +28,6 @@ namespace Loxone.Client.Contracts
         ControlsCollection SubControls { get; }
         void UpdateStateValue(ValueState change);
         void UpdateStateValue(TextState change);
+        event EventHandler StateChanged;
     }
 }

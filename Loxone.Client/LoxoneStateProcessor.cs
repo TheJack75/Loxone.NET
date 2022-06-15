@@ -66,7 +66,7 @@ namespace Loxone.Client
 
                 foreach (var handler in _handlers)
                 {
-                    if(handler.CanHandle(item.stateChange))
+                    if(await handler.CanHandle(item.stateChange))
                         _ = Task.Run(() => handler.Handle(item.stateChange)).ContinueWith(t =>
                         {
                             if(t.IsFaulted)

@@ -12,6 +12,7 @@ namespace Loxone.Client.Tests
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -38,6 +39,12 @@ namespace Loxone.Client.Tests
         public void MakeSureStructureFileIsSaved()
         {
             Assert.IsNotNull(File.Exists(nameof(Properties.Resources.LoxAPP3_504F94A0DDB8_json)));
+        }
+
+        [TestMethod]
+        public void MakeSureAllControlTypeEnumsAreAssigned()
+        {
+            Assert.IsFalse(_service.StructureFile.Controls.Any(c => c.ControlTypeEnum == Contracts.ControlTypeEnum.NotDefined));
         }
     }
 }

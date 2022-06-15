@@ -11,11 +11,16 @@
 namespace Loxone.Client.Samples.Console
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
+    using System.Text.Json;
+    using System.Text.Json.Serialization;
     using System.Threading;
     using System.Threading.Tasks;
     using Loxone.Client.Commands;
+    using Loxone.Client.Contracts;
     using Loxone.Client.Contracts.Controls;
+    using Loxone.Client.Transport.Serialization;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
 
@@ -37,10 +42,32 @@ namespace Loxone.Client.Samples.Console
 
         private void _service_StructureFileChanged(object sender, EventArgs e)
         {
-            if(_service.StructureFile == null)
+            if (_service.StructureFile == null)
                 _logger.LogInformation("No structure file found");
             else
+            {
                 _logger.LogInformation("Structure file found!");
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    ReferenceHandler = ReferenceHandler.IgnoreCycles
+                };
+                try
+                {
+                    var settings = new Newtonsoft.Json.JsonSerializerSettings
+                    {
+                        TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Objects,
+                    };
+                    var text = Newtonsoft.Json.JsonConvert.SerializeObject(_service.StructureFile, settings);
+                    var file = Newtonsoft.Json.JsonConvert.DeserializeObject<StructureFile>(text, settings);
+
+                    //var text = JsonSerializer.Serialize(_service.StructureFile, options);
+                    //var file = JsonSerializer.Deserialize<StructureFile>(text);
+                }
+                catch (Exception ex)
+                {
+                }
+        }
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)

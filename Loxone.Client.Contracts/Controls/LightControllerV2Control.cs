@@ -15,6 +15,7 @@ namespace Loxone.Client.Contracts.Controls
     using System.Text.Json;
     using System.Text.Json.Serialization;
     using Loxone.Client.Contracts;
+    using Newtonsoft.Json;
 
     public class LightControllerV2Control : LoxoneControlBase
     {
@@ -29,7 +30,11 @@ namespace Loxone.Client.Contracts.Controls
             get
             {
                 var moodListText = GetStateValueAs<string>("moodList");
-                var moods = JsonSerializer.Deserialize<LightMood[]>(moodListText);
+                if(string.IsNullOrEmpty(moodListText))
+                    return new List<LightMood>();
+
+                
+                var moods = JsonConvert.DeserializeObject<LightMood[]>(moodListText);
                 return moods.ToList();
             }
         }
@@ -39,8 +44,10 @@ namespace Loxone.Client.Contracts.Controls
             get
             {
                 var activeMoodsText = GetStateValueAs<string>("activeMoods");
-                var activeMoodIds = JsonSerializer.Deserialize<int[]>(activeMoodsText);
+                if (string.IsNullOrEmpty(activeMoodsText))
+                    return new List<LightMood>();
 
+                var activeMoodIds = JsonConvert.DeserializeObject<int[]>(activeMoodsText);
                 var activeMoods = Moods.Where(m => activeMoodIds.Contains(m.Id));
 
                 return activeMoods.ToList();
@@ -50,11 +57,11 @@ namespace Loxone.Client.Contracts.Controls
 
     public class LightMood
     {
-        [JsonPropertyName("name")]
+        [JsonProperty("name")]
         public string Name { get; set; }
-        [JsonPropertyName("id")]
+        [JsonProperty("id")]
         public int Id { get; set; }
-        [JsonPropertyName("static")]
+        [JsonProperty("static")]
         public bool IsStatic { get; set; }
     }
 }

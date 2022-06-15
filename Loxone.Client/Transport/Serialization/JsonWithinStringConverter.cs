@@ -11,18 +11,20 @@
 namespace Loxone.Client.Transport.Serialization
 {
     using System;
-    using System.Text.Json;
-    using System.Text.Json.Serialization;
+    using Newtonsoft.Json;
 
     internal sealed class JsonWithinStringConverter<T> : JsonConverter<T>
     {
-        public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override T ReadJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
         {
-            string s = reader.GetString();
+            var s = reader.Value.ToString();
             s = s.Replace('\'', '"');
-            return JsonSerializer.Deserialize<T>(s, SerializationHelper.DefaultOptions);
+            return JsonConvert.DeserializeObject<T>(s);
         }
 
-        public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options) => new NotSupportedException();
+        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, T value, Newtonsoft.Json.JsonSerializer serializer)
+        {
+            throw new NotSupportedException();
+        }
     }
 }

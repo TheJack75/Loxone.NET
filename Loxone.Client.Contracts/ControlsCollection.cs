@@ -14,16 +14,17 @@ namespace Loxone.Client.Contracts
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text.Json;
-    using System.Text.Json.Serialization;
+    using Newtonsoft.Json;
 
+    /*
     public class ControlsCollectionConverter : JsonConverter<ControlsCollection>
     {
         public override ControlsCollection Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var controls = (List<ILoxoneControl> )JsonSerializer.Deserialize(ref reader, typeof(List<ILoxoneControl>), options);
-            var collection = new ControlsCollection();
-            controls.ForEach(c => collection.AddControl(c));
+            var controls = (Dictionary<string, ControlDTO>)JsonConvert.DeserializeObject(ref reader, typeof(Dictionary<string, ControlDTO>), options);
+            //var controls = (List<ILoxoneControl> )JsonConvert.DeserializeObject(ref reader, typeof(List<ILoxoneControl>), options);
+            var collection = new ControlsCollection(controls, new ControlFactory());
+            //controls.ForEach(c => collection.AddControl(c));
 
             return collection;
         }
@@ -33,27 +34,29 @@ namespace Loxone.Client.Contracts
             writer.WriteStartArray();
             foreach(var control in value)
             {
-                JsonSerializer.Serialize(writer, control);
+                JsonSerializer.Serialize(writer, control, options);
             }
             writer.WriteEndArray();
-            //JsonSerializer.Serialize(writer, value.AsEnumerable(), options);
+            //JsonSerializer.Serialize(writer, value.ToArray(), options);
         }
-    }
+    }*/
 
-    [JsonConverter(typeof(ControlsCollectionConverter))]
-    public class ControlsCollection : IReadOnlyCollection<ILoxoneControl>, IEnumerable<ILoxoneControl>
+    //[JsonConverter(typeof(ControlsCollectionConverter))]
+    public class ControlsCollection : IReadOnlyCollection<ILoxoneControl>
     {
-        private IDictionary<string, ILoxoneControl> _controls;
         private IDictionary<Uuid, ILoxoneControl> _controlByStateUuids;
-
-        public ControlsCollection()
-        {
-        }
+        private IList<ILoxoneControl> _controls;
 
         public ControlsCollection(IDictionary<string, ControlDTO> controls, IControlFactory controlFactory)
         {
-            _controls = (IDictionary<string, ILoxoneControl>) controlFactory.Create(controls);
-            var allStates = _controls.Values.ToDictionary(v => v, v => v.States);
+            var controlsByUuids = controlFactory.Create(controls.Values);
+            _controls = controlsByUuids.ToList();
+            FillControlStates(controlsByUuids);
+        }
+
+        private void FillControlStates(IEnumerable<ILoxoneControl> controls)
+        {
+            var allStates = controls.ToDictionary(v => v, v => v.States);
 
             var controlStates = new Dictionary<Uuid, ILoxoneControl>();
             foreach (var kvp in allStates)
@@ -75,22 +78,22 @@ namespace Loxone.Client.Contracts
             _controlByStateUuids = controlStates;
         }
 
-        public void AddControl(ILoxoneControl control)
+        public ControlsCollection(IList<ILoxoneControl> controls)
         {
-            _controlByStateUuids.Add(control.Uuid, control);
-            //_controls.Add()
+            _controls = controls;
+            FillControlStates(_controls);
+        }
+
+        public ControlsCollection()
+        {
+
         }
 
         public int Count => _controls.Count;
 
-        public bool IsReadOnly => throw new NotImplementedException();
-
         public IEnumerator<ILoxoneControl> GetEnumerator()
         {
-            foreach (var pair in _controls)
-            {
-                yield return pair.Value;
-            }
+            return _controls.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

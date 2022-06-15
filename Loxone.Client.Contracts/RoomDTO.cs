@@ -13,6 +13,7 @@ namespace Loxone.Client.Contracts
     using System.Collections.Generic;
     using System.Text.Json;
     using System.Text.Json.Serialization;
+    using Newtonsoft.Json.Linq;
 
     public sealed class RoomDTO
     {
@@ -25,6 +26,6 @@ namespace Loxone.Client.Contracts
         public int DefaultRating { get; set; }
 
         [JsonExtensionData]
-        public IDictionary<string, JsonElement> ExtensionData { get; set; }
+        public IDictionary<string, JToken> ExtensionData { get; set; }
     }
 }

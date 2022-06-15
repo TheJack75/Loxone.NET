@@ -13,25 +13,28 @@ namespace Loxone.Client.Contracts
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
+    using System.Linq;
 
-    public sealed class RoomCollection : IReadOnlyCollection<Room>
+    public class RoomCollection : IReadOnlyCollection<Room>
     {
-        private readonly IDictionary<string, RoomDTO> _innerRooms;
+        private IList<Room> _rooms { get; set; }
+
+        public int Count => _rooms.Count;
 
         public RoomCollection(IDictionary<string, RoomDTO> innerRooms)
         {
             Contract.Requires(innerRooms != null);
-            _innerRooms = innerRooms;
+            _rooms = innerRooms.Select(r => new Room(r.Value)).ToList();
         }
 
-        public int Count => _innerRooms.Count;
+        public RoomCollection(IList<Room> rooms)
+        {
+            _rooms = rooms;
+        }
 
         public IEnumerator<Room> GetEnumerator()
         {
-            foreach (var pair in _innerRooms)
-            {
-                yield return new Room(pair.Value);
-            }
+            return _rooms.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -41,7 +44,8 @@ namespace Loxone.Client.Contracts
 
         public string GetRoomName(Uuid roomId)
         {
-            if (_innerRooms.TryGetValue(roomId.ToString(), out var room))
+            var room = _rooms.FirstOrDefault(r => r.Uuid == roomId);
+            if (room != null)
                 return room.Name;
 
             return string.Empty;

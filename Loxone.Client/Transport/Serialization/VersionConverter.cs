@@ -11,15 +11,14 @@
 namespace Loxone.Client.Transport.Serialization
 {
     using System;
-    using System.Text.Json;
-    using System.Text.Json.Serialization;
+    using Newtonsoft.Json;
 
     internal sealed class VersionConverter : JsonConverter<Version>
     {
-        public override Version Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => Version.Parse(reader.GetString());
+        public override Version ReadJson(JsonReader reader, Type objectType, Version existingValue, bool hasExistingValue, JsonSerializer serializer)
+            => Version.Parse(reader.Value.ToString());
 
-        public override void Write(Utf8JsonWriter writer, Version value, JsonSerializerOptions options)
-            => writer.WriteStringValue(value.ToString());
+        public override void WriteJson(JsonWriter writer, Version value, JsonSerializer serializer)
+            => writer.WriteValue(value.ToString());
     }
 }

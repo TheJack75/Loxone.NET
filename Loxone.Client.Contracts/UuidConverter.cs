@@ -11,15 +11,20 @@
 namespace Loxone.Client.Contracts
 {
     using System;
-    using System.Text.Json;
-    using System.Text.Json.Serialization;
+    using Newtonsoft.Json;
 
-    internal sealed class UuidConverter : JsonConverter<Uuid>
+    public sealed class UuidConverter : JsonConverter<Uuid?>
     {
-        public override Uuid Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-            => Uuid.Parse(reader.GetString());
+        public override Uuid? ReadJson(JsonReader reader, Type objectType, Uuid? existingValue, bool hasExistingValue, Newtonsoft.Json.JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null)
+                return null;
+            return Uuid.Parse(reader.Value.ToString());
+        }
 
-        public override void Write(Utf8JsonWriter writer, Uuid value, JsonSerializerOptions options)
-            => writer.WriteStringValue(value.ToString());
+        public override void WriteJson(JsonWriter writer, Uuid? value, JsonSerializer serializer)
+        {
+            writer.WriteValue(value?.ToString());
+        }
     }
 }

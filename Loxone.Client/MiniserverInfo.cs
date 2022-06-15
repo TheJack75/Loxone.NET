@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="MiniserverInfo.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -14,22 +14,27 @@ namespace Loxone.Client
 
     public sealed class MiniserverInfo
     {
-        private Transport.MiniserverInfo _msInfo;
+        public string MiniserverName { get; set; }
 
-        public string MiniserverName => _msInfo.MiniserverName;
+        public SerialNumber SerialNumber { get; set; }
 
-        public SerialNumber SerialNumber => _msInfo.SerialNumber;
+        public MiniserverType MiniserverType { get; set; }
 
-        public MiniserverType MiniserverType => (MiniserverType)_msInfo.MiniserverType;
+        public string LocalAddress { get; set; }
 
-        public string LocalAddress => _msInfo.LocalUrl;
-
-        public string RemoteAddress => _msInfo.RemoteUrl;
+        public string RemoteAddress { get; set; }
 
         internal MiniserverInfo(Transport.MiniserverInfo msInfo)
         {
             Contract.Requires(msInfo != null);
-            this._msInfo = msInfo;
+
+            MiniserverName = msInfo.MiniserverName;
+            SerialNumber = msInfo.SerialNumber;
+            MiniserverType = (MiniserverType)msInfo.MiniserverType;
+            LocalAddress = msInfo.LocalUrl;
+            RemoteAddress = msInfo.RemoteUrl;
         }
+
+        public MiniserverInfo() { }
     }
 }

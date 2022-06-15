@@ -10,13 +10,13 @@
 
 namespace Loxone.Client.Transport
 {
-    using System.Text.Json.Serialization;
+    using Newtonsoft.Json;
 
     public sealed class LXResponse<TValue>
     {
         private struct Root
         {
-            [JsonPropertyName("LL")]
+            [JsonProperty("LL")]
             public LXResponse<TValue> Value { get; set; }
         }
 

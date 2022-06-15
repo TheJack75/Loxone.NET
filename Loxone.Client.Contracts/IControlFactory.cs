@@ -14,7 +14,7 @@ namespace Loxone.Client.Contracts
 
     public interface IControlFactory
     {
-        IReadOnlyDictionary<string, ILoxoneControl> Create(IDictionary<string, ControlDTO> controlDTOs);
+        IEnumerable<ILoxoneControl> Create(IEnumerable<ControlDTO> controlDTOs);
         ILoxoneControl Create(ControlDTO controlDTO);
     }
 }

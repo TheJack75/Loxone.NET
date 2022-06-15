@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="LocalizationInfo.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -15,8 +15,6 @@ namespace Loxone.Client
 
     public sealed class LocalizationInfo
     {
-        private Transport.MiniserverInfo _msInfo;
-
         private CultureInfo _culture;
 
         public CultureInfo Culture
@@ -24,26 +22,34 @@ namespace Loxone.Client
             get
             {
                 if (_culture == null)
-                {
-                    _culture = CultureHelper.GetCultureByThreeLetterWindowsLanguageName(_msInfo.LanguageCode);
-                }
+                    _culture = CultureHelper.GetCultureByThreeLetterWindowsLanguageName(LanguageCode);
 
                 return _culture;
             }
         }
+        public string LanguageCode { get; set; }
+        public string CurrencySymbol { get; set; }
 
-        public string CurrencySymbol => _msInfo.Currency;
+        public TemperatureUnit TemperatureUnit { get; set; }
 
-        public TemperatureUnit TemperatureUnit => (TemperatureUnit)_msInfo.TemperatureUnit;
+        public string CategoryTitle { get; set; }
 
-        public string CategoryTitle => _msInfo.CategoryTitle;
-
-        public string RoomTitle => _msInfo.RoomTitle;
+        public string RoomTitle { get; set; }
 
         internal LocalizationInfo(Transport.MiniserverInfo msInfo)
         {
             Contract.Requires(msInfo != null);
-            this._msInfo = msInfo;
+
+            LanguageCode = msInfo.LanguageCode;
+            CurrencySymbol = msInfo.Currency;
+            TemperatureUnit = (TemperatureUnit)msInfo.TemperatureUnit;
+            CategoryTitle = msInfo.CategoryTitle;
+            RoomTitle = msInfo.RoomTitle;
+        }
+
+        public LocalizationInfo()
+        {
+
         }
     }
 }

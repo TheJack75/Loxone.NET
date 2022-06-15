@@ -1,14 +1,24 @@
-﻿namespace Loxone.Client.Commands
+namespace Loxone.Client.Commands
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     public class CommandInvoker
     {
-        public CommandBase Command { get; set; }
+        private Queue<CommandBase> _commands;
 
         public async Task ExecuteAsync()
         {
-            await Command.ExecuteAsync();
+            while(_commands.Count > 0)
+            {
+                var command = _commands.Dequeue();
+                await command.ExecuteAsync();
+            }
+        }
+
+        public async Task QueueAsync(CommandBase command)
+        {
+            await Task.Run(() => _commands.Enqueue(command));
         }
     }
 }

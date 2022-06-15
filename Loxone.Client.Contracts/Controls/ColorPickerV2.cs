@@ -32,6 +32,9 @@ namespace Loxone.Client.Contracts.Controls
             {
 
                 var hsvText = GetStateValueAs<string>("color");
+                if (string.IsNullOrEmpty(hsvText))
+                    return false;
+
                 var regex = new Regex(HSV_REGEX_PATTERN);
                 var matches = regex.Match(hsvText);
                 return matches.Success;
@@ -44,6 +47,9 @@ namespace Loxone.Client.Contracts.Controls
             {
                 Color result;
                 var hsvText = GetStateValueAs<string>("color");
+                if (string.IsNullOrEmpty(hsvText))
+                    return new Color();
+
                 var regex = new Regex(HSV_REGEX_PATTERN);
                 var matches = regex.Match(hsvText);
                 if (matches.Success)
@@ -76,6 +82,9 @@ namespace Loxone.Client.Contracts.Controls
             get
             {
                 var tempText = GetStateValueAs<string>("color");
+                if (string.IsNullOrEmpty(tempText))
+                    return new ColorTemperatureDTO();
+
                 var regex = new Regex(TEMP_REGEX_PATTERN);
                 var matches = regex.Match(tempText);
                 if (matches.Success)

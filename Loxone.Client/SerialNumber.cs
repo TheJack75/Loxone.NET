@@ -14,7 +14,10 @@ namespace Loxone.Client
     using System.Globalization;
     using System.Linq;
     using System.Text;
+    using Loxone.Client.Transport.Serialization;
+    using Newtonsoft.Json;
 
+    [JsonConverter(typeof(SerialNumberConverter))]
     public struct SerialNumber : IEquatable<SerialNumber>
     {
         private byte[] _bytes;

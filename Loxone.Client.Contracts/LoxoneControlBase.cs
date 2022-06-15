@@ -14,7 +14,7 @@ namespace Loxone.Client.Contracts
     using System.Linq;
     using System;
     using System.Text.Json.Serialization;
-
+    
     public abstract class LoxoneControlBase : ILoxoneControl
     {
         private ControlDTO _controlDTO;
@@ -31,12 +31,13 @@ namespace Loxone.Client.Contracts
         public IReadOnlyDictionary<string, Uuid> States { get; set; } = new Dictionary<string, Uuid>();
         public ControlsCollection SubControls { get; set; } = new ControlsCollection();
         public Dictionary<string, object> Details { get; set; }
-        [JsonConverter(typeof(UuidAsDictionaryKeyConverter<StateInfo>))]
+        //[JsonConverter(typeof(UuidAsDictionaryKeyConverter<StateInfo>))]
         public Dictionary<Uuid, StateInfo> StateValues { get; set; } = new Dictionary<Uuid, StateInfo>();
 
         public string RoomName { get; set; }
 
         public string CategoryName { get; set; }
+        public event EventHandler StateChanged;
 
         public LoxoneControlBase(ControlDTO controlDTO)
         {
@@ -61,12 +62,14 @@ namespace Loxone.Client.Contracts
         {
             StateValues[valueState.Control] = new StateInfo(valueState.Value, DateTimeOffset.Now);
             StateValuesUpdated();
+            StateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public void UpdateStateValue(TextState textState)
         {
             StateValues[textState.Control] = new StateInfo(textState.Text, DateTimeOffset.Now);
             StateValuesUpdated();
+            StateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public virtual void StateValuesUpdated()
@@ -76,6 +79,9 @@ namespace Loxone.Client.Contracts
 
         protected T GetStateValueAs<T>(string stateName)
         {
+            if (!States.ContainsKey(stateName))
+                return default;
+
             var uuid = States[stateName];
             if (uuid == null)
                 return default;

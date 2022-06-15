@@ -10,62 +10,62 @@
 
 namespace Loxone.Client.Transport.Serialization
 {
+    using System;
     using System.IO;
     using System.Text.Encodings.Web;
-    using System.Text.Json;
-    using System.Text.Json.Serialization;
     using System.Threading;
     using System.Threading.Tasks;
     using Loxone.Client.Transport.Serialization.Responses;
+    using Loxone.Client.Contracts;
+    using Newtonsoft.Json;
 
-    internal static class SerializationHelper
+    public static class SerializationHelper
     {
-        private static readonly JsonConverter[] _defaultConvertes = new JsonConverter[]
+        private static readonly JsonConverter[] _defaultConverters = new JsonConverter[]
         {
             new SerialNumberConverter(),
             new UuidConverter(),
             new ColorConverter(),
             new VersionConverter(),
             new QuotedInt32Converter(),
+            new JsonWithinStringConverter<Api>(),
             new FormattedDateTimeConverter("yyyy'-'MM'-'dd' 'HH':'mm':'ss"),
-
         };
 
-        private static readonly JsonSerializerOptions _options = InitializeOptions();
+        internal static readonly JsonSerializerSettings DefaultSettings = CreateDefaultSettings();
 
-        internal static readonly JsonSerializerOptions DefaultOptions = CreateDefaultOptions();
-
-        private static JsonSerializerOptions CreateDefaultOptions()
+        private static JsonSerializerSettings CreateDefaultSettings()
         {
-            var options = new JsonSerializerOptions
+            var options = new JsonSerializerSettings
             {
-                PropertyNameCaseInsensitive = true,
-                WriteIndented = true,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                TypeNameHandling = TypeNameHandling.Objects
             };
 
-            for (int i = 0; i < _defaultConvertes.Length; i++)
+            for (int i = 0; i < _defaultConverters.Length; i++)
             {
-                options.Converters.Add(_defaultConvertes[i]);
+                options.Converters.Add(_defaultConverters[i]);
             }
 
             return options;
         }
 
-        private static JsonSerializerOptions InitializeOptions()
+        private static JsonSerializerSettings InitializeSettings()
         {
-            var options = CreateDefaultOptions();
-            options.Converters.Add(new JsonWithinStringConverter<Api>());
+            var options = CreateDefaultSettings();
             return options;
         }
 
-        public static T Deserialize<T>(string s) => JsonSerializer.Deserialize<T>(s, _options);
+        public static T Deserialize<T>(string s) => JsonConvert.DeserializeObject<T>(s, DefaultSettings);
 
-        public static ValueTask<T> DeserializeAsync<T>(Stream stream, CancellationToken cancellationToken)
-            => JsonSerializer.DeserializeAsync<T>(stream, _options, cancellationToken);
+        public async static Task<T> DeserializeAsync<T>(TextReader stream)
+        {            
+            return (T)new JsonSerializer().Deserialize(stream, typeof(T));
+        }
 
-        public static Task SerializeAsync<T>(Stream stream, T value, CancellationToken cancellationToken)
-            => JsonSerializer.SerializeAsync<T>(stream, value, _options, cancellationToken);
+        public async static Task SerializeAsync<T>(TextWriter stream, T value)
+            => await Task.Run(() => new JsonSerializer().Serialize(stream, value, typeof(T)));
+
+        public async static Task<string> Serialize<T>(T value)
+            => await Task.Run(() => JsonConvert.SerializeObject(value, DefaultSettings));
     }
 }

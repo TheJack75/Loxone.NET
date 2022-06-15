@@ -11,7 +11,7 @@
 namespace Loxone.Client.Transport.Serialization.Responses
 {
     using System;
-    using System.Text.Json.Serialization;
+    using Newtonsoft.Json;
 
     internal sealed class GetToken
     {
@@ -24,7 +24,7 @@ namespace Loxone.Client.Transport.Serialization.Responses
 
         public int TokenRights { get; set; }
 
-        [JsonPropertyName("unsecurePass")]
+        [JsonProperty("unsecurePass")]
         public bool UnsecurePassword { get; set; }
     }
 }

@@ -14,26 +14,30 @@ namespace Loxone.Client
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
+    using System.Linq;
+    using System.Text.Json.Serialization;
     using Loxone.Client.Contracts;
 
     public sealed class CategoryCollection : IReadOnlyCollection<Category>
     {
-        private readonly IDictionary<string, Transport.CategoryDTO> _innerCategories;
+        private IList<Category> _categories { get; set; }
 
         internal CategoryCollection(IDictionary<string, Transport.CategoryDTO> innerCategories)
         {
             Contract.Requires(innerCategories != null);
-            this._innerCategories = innerCategories;
+            _categories = innerCategories.Values.Select(c => new Category(c)).ToList();
         }
 
-        public int Count => _innerCategories.Count;
+        public CategoryCollection(IList<Category> categories)
+        {
+            _categories = categories;
+        }
+
+        public int Count => _categories.Count;
 
         public IEnumerator<Category> GetEnumerator()
         {
-            foreach (var pair in _innerCategories)
-            {
-                yield return new Category(pair.Value);
-            }
+            return _categories.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -41,9 +45,10 @@ namespace Loxone.Client
             return this.GetEnumerator();
         }
 
-        internal string GetCategoryName(Uuid value)
+        internal string GetCategoryName(Uuid categoryId)
         {
-            if (_innerCategories.TryGetValue(value.ToString(), out var category))
+            var category = _categories.FirstOrDefault(r => r.Uuid == categoryId);
+            if (category != null)
                 return category.Name;
 
             return string.Empty;

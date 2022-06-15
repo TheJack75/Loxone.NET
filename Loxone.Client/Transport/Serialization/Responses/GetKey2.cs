@@ -10,7 +10,7 @@
 
 namespace Loxone.Client.Transport.Serialization.Responses
 {
-    using System.Text.Json.Serialization;
+    using Newtonsoft.Json;
 
     internal sealed class GetKey2
     {
@@ -18,7 +18,7 @@ namespace Loxone.Client.Transport.Serialization.Responses
 
         public string Salt { get; set; }
 
-        [JsonPropertyName("hashAlg")]
+        [JsonProperty("hashAlg")]
         public string HashAlgorithm { get; set; }
     }
 }
