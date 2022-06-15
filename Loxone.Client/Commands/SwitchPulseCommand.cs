@@ -18,7 +18,7 @@ namespace Loxone.Client.Commands
             await SendRequest();
         }
 
-        protected override string GetActionUri()
+        public override string GetActionUri()
         {
             if(_switchControl.IsOn)
                 return $"{Control.Uuid}/off";

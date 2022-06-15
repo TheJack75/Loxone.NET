@@ -22,6 +22,6 @@ namespace Loxone.Client.Commands
             _ = await Connection.SendCommand(this, new CancellationToken()).ConfigureAwait(false);
         }
 
-        protected abstract string GetActionUri();
+        public abstract string GetActionUri();
     }
 }

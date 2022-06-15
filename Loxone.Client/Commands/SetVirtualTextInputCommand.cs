@@ -1,4 +1,4 @@
-﻿namespace Loxone.Client.Commands
+namespace Loxone.Client.Commands
 {
     using System;
     using System.Threading.Tasks;
@@ -20,7 +20,7 @@
             await SendRequest();
         }
 
-        protected override string GetActionUri()
+        public override string GetActionUri()
         {
             var escapedName = Uri.EscapeDataString(_virtualInputName);
             var escapedValue = Uri.EscapeDataString(_value);
