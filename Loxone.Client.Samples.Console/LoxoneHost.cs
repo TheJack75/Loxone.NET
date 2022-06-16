@@ -93,6 +93,9 @@ namespace Loxone.Client.Samples.Console
             _logger.LogInformation("Press enter list all available moods and the active moods of 'RGB legplanken zitkamer'");
             Console.ReadLine();
 
+            var c = new SetVirtualTextInputCommand("OfficeLastReadingDate", DateTimeOffset.Now.ToString("dd/MM/yyyy HH:mm:ss"), _connection);
+            c.ExecuteAsync();
+
             _logger.LogInformation("Switching on/off first light switch");
             var lightController = _service.StructureFile.Controls.FirstOrDefault(c => c is LightControllerV2Control && c.Name == "RGB legplanken zitkamer") as LightControllerV2Control;
             _logger.LogWarning($"All moods:");

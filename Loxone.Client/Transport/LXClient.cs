@@ -69,8 +69,10 @@ namespace Loxone.Client.Transport
         {
             var response = await RequestCommandInternalAsync<T>(command, encryption, cancellationToken).ConfigureAwait(false);
 
-            string control = Uri.EscapeUriString(response.Control);
-            if ((validation & RequestCommandValidation.Command) != 0 && !AreCommandsEqual(command, control))
+            var toCheckBase = response.Control.Replace(response.Value.ToString(), "REPLACEME");
+            var valueEscaped = Uri.EscapeDataString(response.Value.ToString());
+            var toCheck = Uri.EscapeUriString(toCheckBase).Replace("REPLACEME", valueEscaped);
+            if ((validation & RequestCommandValidation.Command) != 0 && !AreCommandsEqual(command, toCheck))
             {
                 throw new MiniserverTransportException();
             }

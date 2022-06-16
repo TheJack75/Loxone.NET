@@ -98,7 +98,7 @@ namespace Loxone.Client
             }
             catch (Exception ex)
             {
-
+                _logger.LogError(ex, "Error during start. See exception for more details.");
             }
         }
 
