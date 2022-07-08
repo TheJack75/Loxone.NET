@@ -18,19 +18,17 @@ namespace Loxone.Client.Transport
     using System.Threading;
     using System.Threading.Tasks;
     using Loxone.Client.Contracts;
+    using Microsoft.Extensions.Logging;
 
     internal sealed class LXWebSocket : LXClient
     {
         private ClientWebSocket _webSocket;
-
         private CancellationTokenSource _receiveLoopCancellation;
-
-        private ICommandHandler _pendingCommand;
-
+        private Queue<ICommandHandler> _pendingHandlers;
         private LXHttpClient _httpClient;
-
         private readonly IEncryptorProvider _encryptorProvider;
         private readonly ILoxoneStateQueue _stateQueue;
+        private readonly ILogger _logger;
 
         protected internal override LXClient HttpClient
         {
@@ -44,11 +42,13 @@ namespace Loxone.Client.Transport
             }
         }
 
-        public LXWebSocket(Uri baseUri, IEncryptorProvider encryptorProvider, ILoxoneStateQueue stateQueue) : base(baseUri)
+        public LXWebSocket(Uri baseUri, IEncryptorProvider encryptorProvider, ILogger logger, ILoxoneStateQueue stateQueue) : base(baseUri)
         {
             Contract.Requires(HttpUtils.IsWebSocketUri(baseUri));
             _encryptorProvider = encryptorProvider;
             _stateQueue = stateQueue;
+            _logger = logger;
+            _pendingHandlers = new Queue<ICommandHandler>();
         }
 
         protected override async Task OpenInternalAsync(CancellationToken cancellationToken)
@@ -85,7 +85,7 @@ namespace Loxone.Client.Transport
                     Contract.Assert(!header.IsLengthEstimated);
                     await DispatchMessageAsync(header, _receiveLoopCancellation.Token).ConfigureAwait(false);
                 }
-                catch
+                catch(Exception ex)
                 {
                     quit = true;
                 }
@@ -96,13 +96,15 @@ namespace Loxone.Client.Transport
         {
             bool processed = false;
 
-            var command = _pendingCommand;
-            if (command != null && command.CanHandleMessage(header.Identifier))
+            if (_pendingHandlers.Count > 0)
             {
-                Interlocked.CompareExchange(ref _pendingCommand, null, command);
-                await command.HandleMessageAsync(header, this, cancellationToken).ConfigureAwait(false);
-                processed = true;
-                (command as IDisposable)?.Dispose();
+                var command = _pendingHandlers.Dequeue();
+                if (command != null && command.CanHandleMessage(header.Identifier))
+                {
+                    await command.HandleMessageAsync(header, this, cancellationToken).ConfigureAwait(false);
+                    processed = true;
+                    (command as IDisposable)?.Dispose();
+                }
             }
 
             if (!processed)
@@ -294,11 +296,13 @@ namespace Loxone.Client.Transport
 
         private async Task EnqueueCommandAsync(string command, ICommandHandler handler, CancellationToken cancellationToken)
         {
-            if (Interlocked.CompareExchange(ref _pendingCommand, handler, null) != null)
+            if (handler == null)
             {
-                // Command already pending.
-                throw new InvalidOperationException();
+                _logger.LogWarning($"Command handler empty");
+                return;
             }
+            _logger.LogDebug($"Added handler to queue for command '{command}'");
+            _pendingHandlers.Enqueue(handler);
 
             if (handler.Encoder != null)
             {

@@ -62,7 +62,8 @@ namespace Loxone.Client.Samples.Console
                 {
                     var config = service.GetRequiredService<IOptions<LoxoneConfig>>().Value;
                     var queue = service.GetRequiredService<ILoxoneStateQueue>();
-                    var connection = new MiniserverConnection(queue, new Uri(config.Uri));
+                    var logger = service.GetRequiredService<Microsoft.Extensions.Logging.ILogger<MiniserverConnection>>();
+                    var connection = new MiniserverConnection(queue, logger, new Uri(config.Uri));
 
                     return connection;
                 }))

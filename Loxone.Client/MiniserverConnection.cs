@@ -18,6 +18,7 @@ namespace Loxone.Client
     using System.Threading.Tasks;
     using Loxone.Client.Commands;
     using Loxone.Client.Transport;
+    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// Encapsulates connection to the Loxone Miniserver.
@@ -35,6 +36,7 @@ namespace Loxone.Client
 
         private volatile int _state;
         private ILoxoneStateQueue _stateQueue;
+        private ILogger _logger;
 
         public bool IsDisposed => _state >= (int)State.Disposing;
 
@@ -131,7 +133,7 @@ namespace Loxone.Client
         private Transport.Encryptor _requestOnlyEncryptor;
         private Transport.Encryptor _requestAndResponseEncryptor;
 
-        public MiniserverConnection(ILoxoneStateQueue stateQueue, Uri address)
+        public MiniserverConnection(ILoxoneStateQueue stateQueue, ILogger logger, Uri address)
         {
             Contract.Requires(address != null);
             Contract.Requires(HttpUtils.IsHttpUri(address));
@@ -140,6 +142,7 @@ namespace Loxone.Client
             _miniserverInfo = new MiniserverLimitedInfo();
             _state = (int)State.Constructed;
             _stateQueue = stateQueue;
+            _logger = logger;
             InitWithUri(address);
         }
 
@@ -161,7 +164,7 @@ namespace Loxone.Client
 
             try
             {
-                _webSocket = new Transport.LXWebSocket(HttpUtils.MakeWebSocketUri(_baseUri), this, _stateQueue);
+                _webSocket = new Transport.LXWebSocket(HttpUtils.MakeWebSocketUri(_baseUri), this, _logger, _stateQueue);
                 _session = new Transport.Session(_webSocket);
                 await CheckMiniserverReachableAsync(cancellationToken).ConfigureAwait(false);
                 await OpenWebSocketAsync(cancellationToken).ConfigureAwait(false);
