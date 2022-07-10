@@ -19,10 +19,12 @@ namespace Loxone.Client
 
     public interface IMiniserverConnection : IDisposable
     {
+        event Func<Task> FatalErrorOccured;
         Uri Address { get; set; }
         MiniserverAuthenticationMethod AuthenticationMethod { get; set; }
         ICredentials Credentials { get; set; }
         MiniserverLimitedInfo MiniserverInfo { get; }
+        MiniserverConnectionState State { get; }
 
         Task<StructureFile> DownloadStructureFileAsync(CancellationToken cancellationToken);
         Task<bool> EnableStatusUpdatesAsync(CancellationToken cancellationToken);

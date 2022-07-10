@@ -23,11 +23,15 @@ namespace Loxone.Client.Tests
         private MiniserverLimitedInfo _miniserverInfo;
         private ICredentials _credentials;
 
+        public event Func<Task> FatalErrorOccured;
+
         public Uri Address { get => _address; set => _address = value; }
         public MiniserverAuthenticationMethod AuthenticationMethod { get => MiniserverAuthenticationMethod.Default; set { } }
         public ICredentials Credentials { get => _credentials; set => _credentials = value; }
 
         public MiniserverLimitedInfo MiniserverInfo => _miniserverInfo;
+
+        public MiniserverConnectionState State => throw new NotImplementedException();
 
         public MiniserverConnectionMock(Uri address)
         {

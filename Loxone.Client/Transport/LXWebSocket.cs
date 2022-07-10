@@ -22,13 +22,23 @@ namespace Loxone.Client.Transport
 
     internal sealed class LXWebSocket : LXClient
     {
+        const int ONE_SECOND_IN_MILLISECONDS = 1000;
+        const int FIVE_SECONDS_IN_MILLISECONDS = 5000;
+        const int FIVE_MINUTES_IN_MILLISECONDS = 300000;
+
         private ClientWebSocket _webSocket;
         private CancellationTokenSource _receiveLoopCancellation;
         private Queue<ICommandHandler> _pendingHandlers;
         private LXHttpClient _httpClient;
+        private Timer _reconnectTimer;
+        private int _reconnectAttempts;
+        private CancellationToken _cancellationToken;
         private readonly IEncryptorProvider _encryptorProvider;
         private readonly ILoxoneStateQueue _stateQueue;
         private readonly ILogger _logger;
+
+        public delegate void ErrorOccuredHandler();
+        public event Func<Task> ErrorOccured;
 
         protected internal override LXClient HttpClient
         {
@@ -49,15 +59,69 @@ namespace Loxone.Client.Transport
             _stateQueue = stateQueue;
             _logger = logger;
             _pendingHandlers = new Queue<ICommandHandler>();
+            _reconnectTimer = new Timer(ReconnectTimerCallback, null, Timeout.Infinite, Timeout.Infinite);
+        }
+
+        private async void ReconnectTimerCallback(object state)
+        {
+            _ = TryReconnectingAsync();
+        }
+
+        private async Task TryReconnectingAsync()
+        {
+            try
+            {
+                _logger.LogInformation($"Reconnecting attempt # {_reconnectAttempts}");
+                if (_webSocket == null)
+                {
+                    await OpenInternalAsync(_cancellationToken).ConfigureAwait(false);
+                }
+
+                if (_receiveLoopCancellation == null)
+                {
+                    StartReceiveLoop();
+                }
+            }
+            catch(Exception ex)
+            {                
+                _logger.LogError(ex, $"Error while trying to reconnect");
+            }
+            finally
+            {
+                _reconnectAttempts++;
+                if (_webSocket != null && _webSocket.State == WebSocketState.Open && _cancellationToken != null)
+                {
+                    ResetReconnectTimer();
+                    _logger.LogInformation($"Reconnect succeeded!");
+                }
+                else
+                {
+                    /*var nextReconnectAttemptDuration = _reconnectAttempts * FIVE_SECONDS_IN_MILLISECONDS;
+                    var limitedNextReconnectAttemptDuration = nextReconnectAttemptDuration >= FIVE_MINUTES_IN_MILLISECONDS ? FIVE_MINUTES_IN_MILLISECONDS : nextReconnectAttemptDuration;
+                    if (_reconnectTimer.Change(limitedNextReconnectAttemptDuration, Timeout.Infinite))
+                    {
+                        _logger.LogWarning($"Trying to reconnect again in {limitedNextReconnectAttemptDuration / ONE_SECOND_IN_MILLISECONDS} seconds");
+                    }
+                    else
+                    {
+                        _logger.LogError("Changing reconnect timer did not succeed, halting the application");
+                        throw new ApplicationException("Unable to continue, see previous error(s) for more information.");
+                    }*/
+                }
+            }
         }
 
         protected override async Task OpenInternalAsync(CancellationToken cancellationToken)
         {
+            _cancellationToken = cancellationToken;
             Contract.Requires(_webSocket == null);
 
             _webSocket = new ClientWebSocket();
-            await _webSocket.ConnectAsync(new UriBuilder(BaseUri) { Path = "ws/rfc6455" }.Uri, cancellationToken).ConfigureAwait(false);
+            var uri = new UriBuilder(BaseUri) { Path = "ws/rfc6455" }.Uri;
+            _logger.LogDebug($"Connecting to '{uri}'");
+            await _webSocket.ConnectAsync(uri, cancellationToken).ConfigureAwait(false);
 
+            _logger.LogDebug("Starting receive loop");
             StartReceiveLoop();
         }
 
@@ -68,7 +132,7 @@ namespace Loxone.Client.Transport
             _receiveLoopCancellation = new CancellationTokenSource();
 
             // Fire and forget, no await here.
-            Task.Run(() => ReceiveLoopAsync());
+            _ = Task.Run(() => ReceiveLoopAsync());
         }
 
         private async Task ReceiveLoopAsync()
@@ -81,15 +145,48 @@ namespace Loxone.Client.Transport
             {
                 try
                 {
+
                     var header = await ReceiveHeaderAsync(_receiveLoopCancellation.Token).ConfigureAwait(false);
                     Contract.Assert(!header.IsLengthEstimated);
                     await DispatchMessageAsync(header, _receiveLoopCancellation.Token).ConfigureAwait(false);
                 }
                 catch(Exception ex)
                 {
+                    _receiveLoopCancellation = null;
+                    _logger.LogError(ex, $"Error in receive loop, quitting.");
+                    _ = OnErrorOccured();
+                    //CloseConnection();
+                    //StartReconnectTimer();
                     quit = true;
                 }
             }
+        }
+
+        private Task OnErrorOccured()
+        {
+            _ = ErrorOccured?.Invoke();
+
+            return Task.CompletedTask;
+        }
+
+        private void CloseConnection()
+        {
+            if(_webSocket != null)
+            {
+                _webSocket.Dispose();
+                _webSocket = null;
+            }
+        }
+
+        private void StartReconnectTimer()
+        {
+            _reconnectTimer.Change(0, Timeout.Infinite);
+        }
+
+        private void ResetReconnectTimer()
+        {
+            _reconnectAttempts = 1;
+            _reconnectTimer.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
         private async Task DispatchMessageAsync(MessageHeader header, CancellationToken cancellationToken)
@@ -309,6 +406,7 @@ namespace Loxone.Client.Transport
                 command = handler.Encoder.EncodeCommand(command);
             }
 
+            _logger.LogDebug($"Sent command: '{command}'");
             await SendStringAsync(command, cancellationToken).ConfigureAwait(false);
         }
 

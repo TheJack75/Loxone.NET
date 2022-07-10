@@ -25,20 +25,14 @@ namespace Loxone.Client
     /// </summary>
     public class MiniserverConnection : Transport.IEncryptorProvider, IMiniserverConnection
     {
-        private enum State
-        {
-            Constructed,
-            Opening,
-            Open,
-            Disposing,
-            Disposed
-        }
-
-        private volatile int _state;
+        public event Func<Task> FatalErrorOccured;
+        
+        private volatile MiniserverConnectionState _state;
         private ILoxoneStateQueue _stateQueue;
         private ILogger _logger;
 
-        public bool IsDisposed => _state >= (int)State.Disposing;
+        public bool IsDisposed => _state >= MiniserverConnectionState.Disposing;
+        public MiniserverConnectionState State => _state;
 
         private MiniserverLimitedInfo _miniserverInfo;
 
@@ -55,7 +49,7 @@ namespace Loxone.Client
                 Contract.Requires(value == null || String.IsNullOrEmpty(value.PathAndQuery));
 
                 CheckDisposed();
-                CheckState(State.Constructed);
+                CheckState(MiniserverConnectionState.Constructed);
 
                 if (value != null)
                 {
@@ -80,7 +74,7 @@ namespace Loxone.Client
             set
             {
                 CheckDisposed();
-                CheckState(State.Constructed);
+                CheckState(MiniserverConnectionState.Constructed);
 
                 _credentials = value;
             }
@@ -94,7 +88,7 @@ namespace Loxone.Client
             set
             {
                 CheckDisposed();
-                CheckState(State.Constructed);
+                CheckState(MiniserverConnectionState.Constructed);
 
                 _authenticationMethod = value;
             }
@@ -132,6 +126,7 @@ namespace Loxone.Client
 
         private Transport.Encryptor _requestOnlyEncryptor;
         private Transport.Encryptor _requestAndResponseEncryptor;
+        private CancellationToken _cancellationToken;
 
         public MiniserverConnection(ILoxoneStateQueue stateQueue, ILogger logger, Uri address)
         {
@@ -140,7 +135,7 @@ namespace Loxone.Client
             Contract.Requires(String.IsNullOrEmpty(address.PathAndQuery));
 
             _miniserverInfo = new MiniserverLimitedInfo();
-            _state = (int)State.Constructed;
+            _state = (int)MiniserverConnectionState.Constructed;
             _stateQueue = stateQueue;
             _logger = logger;
             InitWithUri(address);
@@ -155,34 +150,57 @@ namespace Loxone.Client
             _baseUri = address;
         }
 
+        public async Task CloseAsync()
+        {
+            _webSocket.Dispose();
+            _webSocket = null;
+
+            _session.Dispose();
+            _session = null;
+
+            _authenticator.Dispose();
+            _authenticator = null;
+        }
+
         public async Task OpenAsync(CancellationToken cancellationToken)
         {
+            _cancellationToken = cancellationToken;
             CheckDisposed();
             CheckBeforeOpen();
 
-            ChangeState(State.Opening, State.Constructed);
+            ChangeState(MiniserverConnectionState.Opening, MiniserverConnectionState.Constructed);
+            _logger.LogInformation("Connection opening!");
 
             try
             {
                 _webSocket = new Transport.LXWebSocket(HttpUtils.MakeWebSocketUri(_baseUri), this, _logger, _stateQueue);
+                _webSocket.ErrorOccured += async () => await OnWebSocketError();
                 _session = new Transport.Session(_webSocket);
                 await CheckMiniserverReachableAsync(cancellationToken).ConfigureAwait(false);
                 await OpenWebSocketAsync(cancellationToken).ConfigureAwait(false);
                 _authenticator = CreateAuthenticator();
                 await _authenticator.AuthenticateAsync(cancellationToken).ConfigureAwait(false);
-                ChangeState(State.Open);
+                ChangeState(MiniserverConnectionState.Open);
+                _logger.LogInformation("Connection opened!");
             }
             catch
             {
-                ChangeState(State.Constructed);
+                ChangeState(MiniserverConnectionState.Constructed);
                 throw;
             }
+        }
+
+        private async Task OnWebSocketError()
+        {
+            ChangeState(MiniserverConnectionState.Constructed);
+            await CloseAsync();
+            _ = FatalErrorOccured?.Invoke();
         }
 
         private void CheckBeforeOperation()
         {
             CheckDisposed();
-            CheckState(State.Open);
+            CheckState(MiniserverConnectionState.Open);
         }
 
         public async Task<StructureFile> DownloadStructureFileAsync(CancellationToken cancellationToken)
@@ -280,12 +298,9 @@ namespace Loxone.Client
             throw new ArgumentOutOfRangeException(nameof(AuthenticationMethod));
         }
 
-        private void CheckState(State requiredState)
+        private bool CheckState(MiniserverConnectionState requiredState)
         {
-            if (_state != (int)requiredState)
-            {
-                throw new InvalidOperationException();
-            }
+            return _state == requiredState;
         }
 
         /// <summary>
@@ -296,12 +311,14 @@ namespace Loxone.Client
         /// <exception cref="InvalidOperationException">
         /// The current connection state does not match <paramref name="requiredState"/>.
         /// </exception>
-        private void ChangeState(State newState, State requiredState)
+        private void ChangeState(MiniserverConnectionState newState, MiniserverConnectionState requiredState)
         {
-            if (Interlocked.CompareExchange(ref _state, (int)newState, (int)requiredState) != (int)requiredState)
+            if(_state != requiredState)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($"Cannot set to {newState} because current state {_state} does not match expected state {requiredState}.");
             }
+
+            _state = newState;
         }
 
         /// <summary>
@@ -309,9 +326,12 @@ namespace Loxone.Client
         /// </summary>
         /// <param name="newState">New state.</param>
         /// <returns>Previous state.</returns>
-        private State ChangeState(State newState)
+        private MiniserverConnectionState ChangeState(MiniserverConnectionState newState)
         {
-            return (State)Interlocked.Exchange(ref _state, (int)newState);
+            var originalState = _state;
+            _state = newState;
+
+            return originalState;
         }
 
         private void StartKeepAliveTimer()
@@ -355,11 +375,12 @@ namespace Loxone.Client
 
         protected virtual void Dispose(bool disposing)
         {
-            if (_state != (int)State.Disposed)
+            if (!CheckState(MiniserverConnectionState.Disposed))
             {
                 // May be already disposing on another thread.
-                if (Interlocked.Exchange(ref _state, (int)State.Disposing) != (int)State.Disposing)
+                if(!CheckState(MiniserverConnectionState.Disposing))
                 {
+                    ChangeState(MiniserverConnectionState.Disposing);
                     // Disconnect event handlers.
 
                     if (disposing)
@@ -370,7 +391,7 @@ namespace Loxone.Client
                         _webSocket?.Dispose();
                     }
 
-                    _state = (int)State.Disposed;
+                    ChangeState(MiniserverConnectionState.Disposed);
                 }
             }
         }

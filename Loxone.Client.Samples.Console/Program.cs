@@ -58,7 +58,7 @@ namespace Loxone.Client.Samples.Console
                 .ConfigureServices((_, services) => services.AddOptions())
                 .ConfigureServices((_, services) => services.Configure<LoxoneConfig>(Configuration.GetSection(nameof(LoxoneConfig))))
                 .ConfigureServices((_, services) => services.AddSingleton<ILoxoneStateQueue>(new LoxoneStateQueue()))
-                .ConfigureServices((_, services) => services.AddSingleton<IMiniserverConnection>(service =>
+                .ConfigureServices((_, services) => services.AddTransient<IMiniserverConnection>(service =>
                 {
                     var config = service.GetRequiredService<IOptions<LoxoneConfig>>().Value;
                     var queue = service.GetRequiredService<ILoxoneStateQueue>();
