@@ -30,7 +30,7 @@ namespace Loxone.Client.Tests
             const string CONTROL_TYPE = "InfoOnlyDigital";
             Uuid CONTROL_UUID = Uuid.Parse("991bed10-01f9-2b85-ffff5e20fb3695f6");
             Uuid CATEGORY_UUID = Uuid.Parse("0b734138-036d-0334-ffff403fb0c34b9e");
-            Uuid ACTIVE_STATE_UUID = Uuid.Parse("991bed10-01f9-2b85-ffff5e20fb3695f6");
+            Uuid ACTIVE_STATE_UUID = Uuid.Parse("184100e8-034a-d296-ffff95544eebe62f");
             Uuid ROOM_UUID = Uuid.Parse("0b734138-038c-035e-ffff403fb0c34b9e");
             const string CONTROL_NAME = "Test control";
             const int DEFAULT_RATING = 2;
