@@ -31,12 +31,12 @@ namespace Loxone.Client.Samples.Console
         private readonly IMiniserverConnection _connection;
         private readonly ILogger<LoxoneHost> _logger;
 
-        public LoxoneHost(ILoxoneService service, ILoxoneStateProcessor processor, IMiniserverConnection connection, ILogger<LoxoneHost> logger)
+        public LoxoneHost(ILoxoneService service, ILoxoneStateProcessor processor, ILogger<LoxoneHost> logger)
         {
             _service = service;
             _service.StructureFileChanged += _service_StructureFileChanged;
             _processor = processor;
-            _connection = connection;
+            _connection = service.MiniserverConnection;
             _logger = logger;
         }
 

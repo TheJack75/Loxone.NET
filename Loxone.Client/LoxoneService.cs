@@ -35,6 +35,7 @@ namespace Loxone.Client
         private int _reconnectAttempt;
         private CancellationToken _cancellationToken;
 
+        public IMiniserverConnection MiniserverConnection => _connection;
         public StructureFile StructureFile
         {
             get { return _structureFile; }

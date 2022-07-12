@@ -96,7 +96,7 @@ namespace Loxone.Client.Transport
                 }
                 else
                 {
-                    /*var nextReconnectAttemptDuration = _reconnectAttempts * FIVE_SECONDS_IN_MILLISECONDS;
+                    var nextReconnectAttemptDuration = _reconnectAttempts * FIVE_SECONDS_IN_MILLISECONDS;
                     var limitedNextReconnectAttemptDuration = nextReconnectAttemptDuration >= FIVE_MINUTES_IN_MILLISECONDS ? FIVE_MINUTES_IN_MILLISECONDS : nextReconnectAttemptDuration;
                     if (_reconnectTimer.Change(limitedNextReconnectAttemptDuration, Timeout.Infinite))
                     {
@@ -106,7 +106,7 @@ namespace Loxone.Client.Transport
                     {
                         _logger.LogError("Changing reconnect timer did not succeed, halting the application");
                         throw new ApplicationException("Unable to continue, see previous error(s) for more information.");
-                    }*/
+                    }
                 }
             }
         }
@@ -149,14 +149,14 @@ namespace Loxone.Client.Transport
                     var header = await ReceiveHeaderAsync(_receiveLoopCancellation.Token).ConfigureAwait(false);
                     Contract.Assert(!header.IsLengthEstimated);
                     await DispatchMessageAsync(header, _receiveLoopCancellation.Token).ConfigureAwait(false);
+                    //throw new Exception("TEST");
                 }
                 catch(Exception ex)
                 {
                     _receiveLoopCancellation = null;
                     _logger.LogError(ex, $"Error in receive loop, quitting.");
                     _ = OnErrorOccured();
-                    //CloseConnection();
-                    //StartReconnectTimer();
+                    StartReconnectTimer();
                     quit = true;
                 }
             }

@@ -19,6 +19,7 @@ namespace Loxone.Client
         event EventHandler<EventArgs> StructureFileChanged;
 
         StructureFile StructureFile { get; }
+        IMiniserverConnection MiniserverConnection { get; }
 
         Task StartAsync(CancellationToken cancellationToken);
         Task StopAsync(CancellationToken cancellationToken);
