@@ -74,7 +74,7 @@ namespace Loxone.Client.Transport
             var toCheck = Uri.EscapeUriString(toCheckBase).Replace("REPLACEME", valueEscaped);
             if ((validation & RequestCommandValidation.Command) != 0 && !AreCommandsEqual(command, toCheck))
             {
-                throw new MiniserverTransportException();
+                throw new MiniserverTransportException($"Commands '{command}' and '{toCheck}' are not equal. Can not continue processing.");
             }
 
             if ((validation & RequestCommandValidation.Status) != 0 && !LXStatusCode.IsSuccess(response.Code))

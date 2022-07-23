@@ -7,6 +7,11 @@ namespace Loxone.Client.Commands
     {
         private Queue<CommandBase> _commands;
 
+        public CommandInvoker()
+        {
+            _commands = new Queue<CommandBase>();
+        }
+
         public async Task ExecuteAsync()
         {
             while(_commands.Count > 0)

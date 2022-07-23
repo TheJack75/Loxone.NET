@@ -28,6 +28,16 @@ namespace Loxone.Client.Tests
         }
     }
 
+    public class ServiceProviderReturningExceptionsMock : IServiceProvider
+    {
+        public object GetService(Type serviceType)
+        {
+            if (serviceType == typeof(IMiniserverConnection))
+                return new MiniserverConnectionThrowsErrorMock(new Uri("http://hello.world:999"));
+
+            throw new Exception($"Type '{serviceType}' is not mocked yet in the {nameof(ServiceProviderMock)}");
+        }
+    }
 
     [TestClass]
     public class LoxoneServiceTests
@@ -37,7 +47,7 @@ namespace Loxone.Client.Tests
         [TestInitialize]
         public async Task Initializations()
         {
-            _service = new LoxoneService(new ServiceProviderMock(), new OptionsMock(), new LoggingMock());
+            _service = new LoxoneService(new ServiceProviderReturningExceptionsMock(), new OptionsMock(), new LoggingMock());
             await _service.StartAsync(new CancellationToken());
         }
 
@@ -58,5 +68,11 @@ namespace Loxone.Client.Tests
         {
             Assert.IsFalse(_service.StructureFile.Controls.Any(c => c.ControlTypeEnum == Contracts.ControlTypeEnum.NotDefined));
         }
+
+        //[TestMethod]
+        //public async Task MakeSureServiceEntersReconnectMethod()
+        //{
+        //    //Assert.IsTrue(_service.MiniserverConnection.State == MiniserverConnectionState.Disposed);
+        //}
     }
 }

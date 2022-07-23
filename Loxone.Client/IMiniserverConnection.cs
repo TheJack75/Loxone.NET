@@ -19,7 +19,7 @@ namespace Loxone.Client
 
     public interface IMiniserverConnection : IDisposable
     {
-        event Func<Task> FatalErrorOccured;
+        event Func<Exception, Task> FatalErrorOccured;
         Uri Address { get; set; }
         MiniserverAuthenticationMethod AuthenticationMethod { get; set; }
         ICredentials Credentials { get; set; }
@@ -31,5 +31,6 @@ namespace Loxone.Client
         Task<DateTime> GetStructureFileLastModifiedDateAsync(CancellationToken cancellationToken);
         Task OpenAsync(CancellationToken cancellationToken);
         Task<LXResponse<string>> SendCommand<TCommand>(TCommand command, CancellationToken cancellationToken) where TCommand : CommandBase;
+        Task CloseAsync();
     }
 }

@@ -11,6 +11,7 @@
 namespace Loxone.Client.Samples.Console
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.Json;
@@ -30,6 +31,7 @@ namespace Loxone.Client.Samples.Console
         private readonly ILoxoneStateProcessor _processor;
         private readonly IMiniserverConnection _connection;
         private readonly ILogger<LoxoneHost> _logger;
+        private readonly TestCommandExecutor _testCommandExecutor;
 
         public LoxoneHost(ILoxoneService service, ILoxoneStateProcessor processor, ILogger<LoxoneHost> logger)
         {
@@ -38,6 +40,7 @@ namespace Loxone.Client.Samples.Console
             _processor = processor;
             _connection = service.MiniserverConnection;
             _logger = logger;
+            _testCommandExecutor = new TestCommandExecutor(_connection);
         }
 
         private void _service_StructureFileChanged(object sender, EventArgs e)
@@ -67,7 +70,7 @@ namespace Loxone.Client.Samples.Console
                 catch (Exception ex)
                 {
                 }
-        }
+            }
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -90,8 +93,11 @@ namespace Loxone.Client.Samples.Console
                 await invoker.Execute();
             }*/
 
-            _logger.LogInformation("Press enter list all available moods and the active moods of 'RGB legplanken zitkamer'");
+            //_logger.LogInformation("Press enter list all available moods and the active moods of 'RGB legplanken zitkamer'");
+            _logger.LogInformation("Press enter to change FileServerActive value every 5 seconds.");
             Console.ReadLine();
+
+            _ = _testCommandExecutor.ExecuteAsync(cancellationToken);
 
             var c = new SetVirtualTextInputCommand("OfficeLastReadingDate", DateTimeOffset.Now.ToString("dd/MM/yyyy HH:mm:ss"), _connection);
             c.ExecuteAsync();
@@ -118,6 +124,32 @@ namespace Loxone.Client.Samples.Console
         {
             await _processor.StopAsync(cancellationToken);
             await _service.StopAsync(cancellationToken);
+        }
+    }
+
+    public class TestCommandExecutor
+    {
+        private readonly IMiniserverConnection _connection;
+
+        public TestCommandExecutor(IMiniserverConnection connection)
+        {
+            _connection = connection;
+        }
+
+        public async Task ExecuteAsync(CancellationToken cancellationToken)
+        {
+            var invoker = new CommandInvoker();
+            var value = false;
+            while (true)
+            {
+                var valueText = value ? "1" : "0";
+                var command = new SetVirtualTextInputCommand("FileServerActive", valueText, _connection);
+                await invoker.QueueAsync(command);
+                await invoker.ExecuteAsync();
+
+                value = !value;
+                Thread.Sleep(5000);
+            }
         }
     }
 }
