@@ -40,7 +40,7 @@ namespace Loxone.Client.Samples.Console
             _processor = processor;
             _connection = service.MiniserverConnection;
             _logger = logger;
-            _testCommandExecutor = new TestCommandExecutor(_connection);
+            _testCommandExecutor = new TestCommandExecutor();
         }
 
         private void _service_StructureFileChanged(object sender, EventArgs e)
@@ -97,10 +97,12 @@ namespace Loxone.Client.Samples.Console
             _logger.LogInformation("Press enter to change FileServerActive value every 5 seconds.");
             Console.ReadLine();
 
-            _ = _testCommandExecutor.ExecuteAsync(cancellationToken);
+            _ = _testCommandExecutor.ExecuteAsync(_service.MiniserverConnection, cancellationToken);
 
-            var c = new SetVirtualTextInputCommand("OfficeLastReadingDate", DateTimeOffset.Now.ToString("dd/MM/yyyy HH:mm:ss"), _connection);
-            c.ExecuteAsync();
+            var c = new SetVirtualTextInputCommand("OfficeLastReadingDate", DateTimeOffset.Now.ToString("dd/MM/yyyy HH:mm:ss"));
+            var invoker = new CommandInvoker(_service.MiniserverConnection, cancellationToken);
+            invoker.Command = c;
+            await invoker.ExecuteAsync();
 
             _logger.LogInformation("Switching on/off first light switch");
             var lightController = _service.StructureFile.Controls.FirstOrDefault(c => c is LightControllerV2Control && c.Name == "RGB legplanken zitkamer") as LightControllerV2Control;
@@ -129,22 +131,16 @@ namespace Loxone.Client.Samples.Console
 
     public class TestCommandExecutor
     {
-        private readonly IMiniserverConnection _connection;
 
-        public TestCommandExecutor(IMiniserverConnection connection)
+        public async Task ExecuteAsync(IMiniserverConnection connection, CancellationToken cancellationToken)
         {
-            _connection = connection;
-        }
-
-        public async Task ExecuteAsync(CancellationToken cancellationToken)
-        {
-            var invoker = new CommandInvoker();
+            var invoker = new CommandInvoker(connection, cancellationToken);
             var value = false;
             while (true)
             {
                 var valueText = value ? "1" : "0";
-                var command = new SetVirtualTextInputCommand("FileServerActive", valueText, _connection);
-                await invoker.QueueAsync(command);
+                var command = new SetVirtualTextInputCommand("FileServerActive", valueText);
+                invoker.Command = command;
                 await invoker.ExecuteAsync();
 
                 value = !value;

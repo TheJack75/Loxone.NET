@@ -1,29 +1,30 @@
 namespace Loxone.Client.Commands
 {
+    using System;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Threading.Tasks;
 
     public class CommandInvoker
     {
-        private Queue<CommandBase> _commands;
+        private IMiniserverConnection _connection;
+        private CancellationToken _cancellationToken;
 
-        public CommandInvoker()
+        public CommandInvoker(IMiniserverConnection connection, CancellationToken cancellationToken)
         {
-            _commands = new Queue<CommandBase>();
+            _connection = connection;
+            _connection.OpenAsync(cancellationToken);
+            _cancellationToken = cancellationToken;
         }
+
+        public CommandBase Command { get; set; }
 
         public async Task ExecuteAsync()
         {
-            while(_commands.Count > 0)
-            {
-                var command = _commands.Dequeue();
-                await command.ExecuteAsync();
-            }
-        }
+            if (Command == null)
+                return;
 
-        public async Task QueueAsync(CommandBase command)
-        {
-            await Task.Run(() => _commands.Enqueue(command));
+            await Task.Run(() => { _connection.SendCommand(Command, _cancellationToken); });
         }
     }
 }

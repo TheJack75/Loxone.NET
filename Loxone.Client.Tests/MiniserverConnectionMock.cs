@@ -23,7 +23,7 @@ namespace Loxone.Client.Tests
         private MiniserverLimitedInfo _miniserverInfo;
         private ICredentials _credentials;
 
-        public event Func<Task> FatalErrorOccured;
+        public event Func<Exception, Task> FatalErrorOccured;
 
         public Uri Address { get => _address; set => _address = value; }
         public MiniserverAuthenticationMethod AuthenticationMethod { get => MiniserverAuthenticationMethod.Default; set { } }
@@ -86,7 +86,7 @@ namespace Loxone.Client.Tests
         private ICredentials _credentials;
         private MiniserverConnectionState _state;
 
-        public event Func<Task> FatalErrorOccured;
+        public event Func<Exception, Task> FatalErrorOccured;
         
         public Uri Address { get => _address; set => _address = value; }
         public MiniserverAuthenticationMethod AuthenticationMethod { get => MiniserverAuthenticationMethod.Default; set { } }
@@ -130,7 +130,7 @@ namespace Loxone.Client.Tests
         public Task OpenAsync(CancellationToken cancellationToken)
         {
             _state = MiniserverConnectionState.Open;
-            FatalErrorOccured?.Invoke();
+            FatalErrorOccured?.Invoke(new Exception());
             return Task.CompletedTask;
         }
 
