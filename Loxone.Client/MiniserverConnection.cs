@@ -155,7 +155,12 @@ namespace Loxone.Client
 
         public Task CloseAsync()
         {
-            _webSocket?.Dispose();
+            _logger.LogInformation($"Closing miniserver connection");
+            if (_webSocket != null)
+            {
+                _webSocket.ErrorOccured -= OnWebSocketError;
+                _webSocket.Dispose();
+            }
             _webSocket = null;
 
             _session?.Dispose();
