@@ -22,7 +22,7 @@ namespace Loxone.Client.Contracts.Controls
 
         public bool IsGoingUp => GetStateValueAsBool("up");
         public bool IsGoingDown => GetStateValueAsBool("down");
-        public int Position => GetStateValueAs<int>("position");
-        public int TargetPosition => GetStateValueAs<int>("targetPosition");
+        public byte PositionAsPercentage => (byte)(GetStateValueAs<double>("position") * 100);
+        public byte TargetPositionAsPercentage => (byte)(GetStateValueAs<double>("targetPosition") * 100);
     }
 }
