@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>TheJack0.Loxone.NET</PackageId>
     <Description>Allows connecting to Loxone Miniserver from .NET application.</Description>
-    <PackageVersion>1.9.2</PackageVersion>
+    <Version>1.9.2</Version>
     <NeutralLanguage>en</NeutralLanguage>
     <Product>TheJack0.Loxone.NET</Product>
     <Authors>manison,TheJack</Authors>
