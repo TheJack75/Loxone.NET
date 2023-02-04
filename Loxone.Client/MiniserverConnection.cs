@@ -18,6 +18,7 @@ namespace Loxone.Client
     using System.Threading.Tasks;
     using Loxone.Client.Commands;
     using Loxone.Client.Transport;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
 
     /// <summary>
@@ -25,7 +26,7 @@ namespace Loxone.Client
     /// </summary>
     public class MiniserverConnection : Transport.IEncryptorProvider, IMiniserverConnection
     {
-        public event Func<Task> FatalErrorOccured;
+        public event Func<Exception, Task> FatalErrorOccured;
         
         private volatile MiniserverConnectionState _state;
         private ILoxoneStateQueue _stateQueue;
@@ -34,6 +35,7 @@ namespace Loxone.Client
         public bool IsDisposed => _state >= MiniserverConnectionState.Disposing;
         public MiniserverConnectionState State => _state;
 
+        private readonly IServiceProvider _serviceProvider;
         private MiniserverLimitedInfo _miniserverInfo;
 
         public MiniserverLimitedInfo MiniserverInfo => _miniserverInfo;
@@ -128,12 +130,13 @@ namespace Loxone.Client
         private Transport.Encryptor _requestAndResponseEncryptor;
         private CancellationToken _cancellationToken;
 
-        public MiniserverConnection(ILoxoneStateQueue stateQueue, ILogger logger, Uri address)
+        public MiniserverConnection(IServiceProvider serviceProvider, ILoxoneStateQueue stateQueue, ILogger logger, Uri address)
         {
             Contract.Requires(address != null);
             Contract.Requires(HttpUtils.IsHttpUri(address));
             Contract.Requires(String.IsNullOrEmpty(address.PathAndQuery));
 
+            _serviceProvider = serviceProvider;
             _miniserverInfo = new MiniserverLimitedInfo();
             _state = (int)MiniserverConnectionState.Constructed;
             _stateQueue = stateQueue;
@@ -150,16 +153,25 @@ namespace Loxone.Client
             _baseUri = address;
         }
 
-        public async Task CloseAsync()
+        public Task CloseAsync()
         {
-            _webSocket.Dispose();
+            _logger.LogInformation($"Closing miniserver connection");
+            if (_webSocket != null)
+            {
+                _webSocket.ErrorOccured -= OnWebSocketError;
+                _webSocket.Dispose();
+            }
             _webSocket = null;
 
-            _session.Dispose();
+            _session?.Dispose();
             _session = null;
 
-            _authenticator.Dispose();
+            _authenticator?.Dispose();
             _authenticator = null;
+
+            _state = MiniserverConnectionState.Constructed;
+
+            return Task.CompletedTask;
         }
 
         public async Task OpenAsync(CancellationToken cancellationToken)
@@ -173,8 +185,10 @@ namespace Loxone.Client
 
             try
             {
-                _webSocket = new Transport.LXWebSocket(HttpUtils.MakeWebSocketUri(_baseUri), this, _logger, _stateQueue);
-                _webSocket.ErrorOccured += async () => await OnWebSocketError();
+                var webSocketLogger = _serviceProvider.GetService<ILogger<LXWebSocket>>();
+                _logger.LogDebug($"MiniserverConnection - Initializing new LXWebSocket");
+                _webSocket = new Transport.LXWebSocket(HttpUtils.MakeWebSocketUri(_baseUri), this, webSocketLogger, _stateQueue);
+                _webSocket.ErrorOccured += async (ex) => await OnWebSocketError(ex);
                 _session = new Transport.Session(_webSocket);
                 await CheckMiniserverReachableAsync(cancellationToken).ConfigureAwait(false);
                 await OpenWebSocketAsync(cancellationToken).ConfigureAwait(false);
@@ -190,11 +204,10 @@ namespace Loxone.Client
             }
         }
 
-        private async Task OnWebSocketError()
+        private async Task OnWebSocketError(Exception ex)
         {
-            ChangeState(MiniserverConnectionState.Constructed);
             await CloseAsync();
-            _ = FatalErrorOccured?.Invoke();
+            _ = FatalErrorOccured?.Invoke(ex);
         }
 
         private void CheckBeforeOperation()
@@ -212,6 +225,9 @@ namespace Loxone.Client
 
         public async Task<LXResponse<string>> SendCommand<TCommand>(TCommand command, CancellationToken cancellationToken) where TCommand : CommandBase
         {
+            if (_cancellationToken.IsCancellationRequested)
+                return null;
+
             var response = await _webSocket.RequestCommandAsync<string>($"jdev/sps/io/{command.GetActionUri()}", _defaultEncryption, cancellationToken).ConfigureAwait(false);
             return response;
         }
@@ -313,7 +329,8 @@ namespace Loxone.Client
         /// </exception>
         private void ChangeState(MiniserverConnectionState newState, MiniserverConnectionState requiredState)
         {
-            if(_state != requiredState)
+            _logger.LogDebug($"Changing Miniserver connection state to {newState} (current state {_state}, expected state {requiredState}).");
+            if (_state != requiredState)
             {
                 throw new InvalidOperationException($"Cannot set to {newState} because current state {_state} does not match expected state {requiredState}.");
             }
@@ -328,6 +345,7 @@ namespace Loxone.Client
         /// <returns>Previous state.</returns>
         private MiniserverConnectionState ChangeState(MiniserverConnectionState newState)
         {
+            _logger.LogDebug($"Changing Miniserver connection state to {newState} (current state {_state}).");
             var originalState = _state;
             _state = newState;
 

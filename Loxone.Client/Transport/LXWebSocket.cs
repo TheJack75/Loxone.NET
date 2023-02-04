@@ -38,7 +38,7 @@ namespace Loxone.Client.Transport
         private readonly ILogger _logger;
 
         public delegate void ErrorOccuredHandler();
-        public event Func<Task> ErrorOccured;
+        public event Func<Exception, Task> ErrorOccured;
 
         protected internal override LXClient HttpClient
         {
@@ -155,16 +155,16 @@ namespace Loxone.Client.Transport
                 {
                     _receiveLoopCancellation = null;
                     _logger.LogError(ex, $"Error in receive loop, quitting.");
-                    _ = OnErrorOccured();
-                    StartReconnectTimer();
+                    _ = OnErrorOccured(ex);
+                    //StartReconnectTimer();
                     quit = true;
                 }
             }
         }
 
-        private Task OnErrorOccured()
+        private Task OnErrorOccured(Exception ex)
         {
-            _ = ErrorOccured?.Invoke();
+            _ = ErrorOccured?.Invoke(ex);
 
             return Task.CompletedTask;
         }
@@ -356,8 +356,7 @@ namespace Loxone.Client.Transport
             }
             else if (received == segment.Count && !eom && throwIfNotEom)
             {
-                // More data available but unexpected.
-                throw new MiniserverTransportException();
+                throw new MiniserverTransportException("More data available but unexpected.");
             }
         }
 
