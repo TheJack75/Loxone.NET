@@ -39,8 +39,11 @@ namespace Loxone.Client.Samples.Console
             };
 
             Log.Logger = new LoggerConfiguration()
+              .MinimumLevel.Debug()
               .Enrich.FromLogContext()
-              .WriteTo.Console()
+              .Enrich.WithThreadId()
+              .Enrich.WithThreadName()
+              .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj} {Properties}{NewLine}{Exception}")
               .CreateLogger();
 
             var hostBuilder = CreateHostBuilder().Build();
@@ -62,8 +65,8 @@ namespace Loxone.Client.Samples.Console
                 {
                     var config = service.GetRequiredService<IOptions<LoxoneConfig>>().Value;
                     var queue = service.GetRequiredService<ILoxoneStateQueue>();
-                    var logger = service.GetRequiredService<Microsoft.Extensions.Logging.ILogger<MiniserverConnection>>();
-                    var connection = new MiniserverConnection(queue, logger, new Uri(config.Uri));
+                    var logger = service.GetRequiredService<ILogger<MiniserverConnection>>();
+                    var connection = new MiniserverConnection(service, queue, logger, new Uri(config.Uri));
 
                     return connection;
                 }))

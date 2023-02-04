@@ -1,21 +1,15 @@
 namespace Loxone.Client.Commands
 {
     using System.Threading.Tasks;
-    using Loxone.Client;
     using Loxone.Client.Contracts;
 
     public class SwitchPulseCommand : CommandBase
     {
         private LightSwitchControl _switchControl;
 
-        public SwitchPulseCommand(LightSwitchControl control, IMiniserverConnection connection) : base(control, connection)
+        public SwitchPulseCommand(LightSwitchControl control) : base(control)
         {
             _switchControl = control;
-        }
-
-        public override async Task ExecuteAsync()
-        {
-            await SendRequest();
         }
 
         public override string GetActionUri()
