@@ -12,7 +12,6 @@ namespace Loxone.Client.Contracts.Controls
 {
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text.Json;
     using System.Text.Json.Serialization;
     using Loxone.Client.Contracts;
     using Newtonsoft.Json;
@@ -53,15 +52,5 @@ namespace Loxone.Client.Contracts.Controls
                 return activeMoods.ToList();
             }
         }
-    }
-
-    public class LightMood
-    {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-        [JsonProperty("id")]
-        public int Id { get; set; }
-        [JsonProperty("static")]
-        public bool IsStatic { get; set; }
     }
 }

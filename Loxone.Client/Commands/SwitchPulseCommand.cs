@@ -1,13 +1,13 @@
 namespace Loxone.Client.Commands
 {
-    using System.Threading.Tasks;
     using Loxone.Client.Contracts;
+    using Loxone.Client.Contracts.Controls;
 
     public class SwitchPulseCommand : CommandBase
     {
-        private LightSwitchControl _switchControl;
+        private IOnOffControl _switchControl;
 
-        public SwitchPulseCommand(LightSwitchControl control) : base(control)
+        public SwitchPulseCommand(IOnOffControl control) : base(control)
         {
             _switchControl = control;
         }

@@ -175,21 +175,6 @@ namespace Loxone.Client.Contracts
         }
         public ClimateControllerControl() : base() { }
     }
-    public class LightSwitchControl : LoxoneControlBase
-    {
-        public LightSwitchControl(ControlDTO controlDTO) : base(controlDTO)
-        {
-        }
-        public LightSwitchControl() : base() { }
-
-        public bool IsOn
-        {
-            get
-            {
-                return GetStateValueAsBool("active");
-            }
-        }
-    }
     public class LoadManagerControl : LoxoneControlBase
     {
         public LoadManagerControl(ControlDTO controlDTO) : base(controlDTO)

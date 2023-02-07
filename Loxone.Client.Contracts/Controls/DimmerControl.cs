@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // <copyright file="StructureFile.cs">
 //     Copyright (c) The Loxone.NET Authors.  All rights reserved.
 // </copyright>
@@ -12,7 +12,7 @@ namespace Loxone.Client.Contracts.Controls
 {
     using Loxone.Client.Contracts;
 
-    public class DimmerControl : LoxoneControlBase
+    public class DimmerControl : LoxoneControlBase, IIsDimmable, IOnOffControl
     {
         public DimmerControl(ControlDTO controlDTO) : base(controlDTO) { }
 
@@ -22,5 +22,6 @@ namespace Loxone.Client.Contracts.Controls
         public int Min => GetStateValueAs<int>("min");
         public int Max => GetStateValueAs<int>("max");
         public int Step => GetStateValueAs<int>("step");
+        public bool IsOn => Position > 0;
     }
 }

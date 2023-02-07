@@ -11,17 +11,13 @@
 namespace Loxone.Client.Samples.Console
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Text.Json;
     using System.Text.Json.Serialization;
     using System.Threading;
     using System.Threading.Tasks;
     using Loxone.Client.Commands;
-    using Loxone.Client.Contracts;
     using Loxone.Client.Contracts.Controls;
-    using Loxone.Client.Transport.Serialization;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
 
@@ -94,13 +90,20 @@ namespace Loxone.Client.Samples.Console
             }*/
 
             //_logger.LogInformation("Press enter list all available moods and the active moods of 'RGB legplanken zitkamer'");
+            _logger.LogInformation("Press enter to switch dining room light on/off");
+            Console.ReadLine();
+            var invoker = new CommandInvoker(_service.MiniserverConnection, cancellationToken);
+
+            var diningRoomLight = _service.StructureFile.Controls.FirstOrDefault(c => c is DimmerControl && c.RoomName == "Eetkamer") as DimmerControl;
+            await diningRoomLight.Off(_service.MiniserverConnection);
+
             _logger.LogInformation("Press enter to change FileServerActive value every 5 seconds.");
             Console.ReadLine();
 
             _ = _testCommandExecutor.ExecuteAsync(_service.MiniserverConnection, cancellationToken);
 
             var c = new SetVirtualTextInputCommand("OfficeLastReadingDate", DateTimeOffset.Now.ToString("dd/MM/yyyy HH:mm:ss"));
-            var invoker = new CommandInvoker(_service.MiniserverConnection, cancellationToken);
+            
             invoker.Command = c;
             await invoker.ExecuteAsync();
 
