@@ -19,6 +19,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="4.10.2" />
     <PackageReference Include="System.Text.Json" Version="6.0.3" />
     <PackageReference Include="DerConverter" Version="3.0.0.82" />
   </ItemGroup>
