@@ -95,7 +95,7 @@ namespace Loxone.Client.Samples.Console
             var invoker = new CommandInvoker(_service.MiniserverConnection, cancellationToken);
 
             var diningRoomLight = _service.StructureFile.Controls.FirstOrDefault(c => c is DimmerControl && c.RoomName == "Eetkamer") as DimmerControl;
-            await diningRoomLight.Off(_service.MiniserverConnection);
+            await diningRoomLight.OffAsync(_service.MiniserverConnection);
 
             _logger.LogInformation("Press enter to change FileServerActive value every 5 seconds.");
             Console.ReadLine();

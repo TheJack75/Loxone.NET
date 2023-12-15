@@ -11,18 +11,12 @@
 namespace Loxone.Client.Samples.Console
 {
     using System;
-    using System.Collections;
-    using System.IO;
-    using System.Runtime.Serialization;
     using System.Threading;
     using System.Threading.Tasks;
-    using Loxone.Client.Commands;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Options;
     using Microsoft.Extensions.Logging;
-    using Serilog.Extensions.Logging;
     using Serilog;
 
     internal class Program
@@ -59,22 +53,8 @@ namespace Loxone.Client.Samples.Console
 
             return Host.CreateDefaultBuilder()
                 .ConfigureServices((_, services) => services.AddOptions())
-                .ConfigureServices((_, services) => services.Configure<LoxoneConfig>(Configuration.GetSection(nameof(LoxoneConfig))))
-                .ConfigureServices((_, services) => services.AddSingleton<ILoxoneStateQueue>(new LoxoneStateQueue()))
-                .ConfigureServices((_, services) => services.AddTransient<IMiniserverConnection>(service =>
-                {
-                    var config = service.GetRequiredService<IOptions<LoxoneConfig>>().Value;
-                    var queue = service.GetRequiredService<ILoxoneStateQueue>();
-                    var logger = service.GetRequiredService<ILogger<MiniserverConnection>>();
-                    var connection = new MiniserverConnection(service, queue, logger, new Uri(config.Uri));
-
-                    return connection;
-                }))
                 .ConfigureServices((_, services) => services.AddHostedService<LoxoneHost>())
-                .ConfigureServices((_, services) => services.AddSingleton<ILoxoneService, LoxoneService>())
-                .ConfigureServices((_, services) => services.AddTransient<ILoxoneStateChangeHandler, LoxoneValueStateHandler>())
-                .ConfigureServices((_, services) => services.AddTransient<ILoxoneStateChangeHandler, LoxoneTextStateHandler>())
-                .ConfigureServices((_, services) => services.AddTransient<ILoxoneStateProcessor, LoxoneStateProcessor>())
+                .ConfigureServices((_, services) => services.AddLoxoneClient(Configuration))
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
