@@ -5,7 +5,7 @@ namespace Loxone.Client.Commands
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class CommandInvoker
+    public class CommandInvoker : ICommandInvoker
     {
         private IMiniserverConnection _connection;
         private CancellationToken _cancellationToken;
