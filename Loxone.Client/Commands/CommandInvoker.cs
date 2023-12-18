@@ -8,23 +8,23 @@ namespace Loxone.Client.Commands
     public class CommandInvoker : ICommandInvoker
     {
         private IMiniserverConnection _connection;
-        private CancellationToken _cancellationToken;
 
-        public CommandInvoker(IMiniserverConnection connection, CancellationToken cancellationToken)
+        public CommandInvoker(IMiniserverConnection connection)
         {
             _connection = connection;
-            _connection.OpenAsync(cancellationToken);
-            _cancellationToken = cancellationToken;
         }
 
         public CommandBase Command { get; set; }
 
-        public async Task ExecuteAsync()
+        public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            if(_connection.State == MiniserverConnectionState.Constructed)
+                await _connection.OpenAsync(cancellationToken);
+
             if (Command == null)
                 return;
 
-            await Task.Run(() => { _connection.SendCommand(Command, _cancellationToken); });
+            await _connection.SendCommand(Command, cancellationToken);
         }
     }
 }

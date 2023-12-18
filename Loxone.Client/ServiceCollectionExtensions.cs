@@ -1,6 +1,7 @@
 namespace Loxone.Client
 {
     using System;
+    using System.Threading;
     using Loxone.Client.Commands;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +28,7 @@ namespace Loxone.Client
             services.AddTransient<ILoxoneStateChangeHandler, LoxoneTextStateHandler>();
             services.AddTransient<ILoxoneStateProcessor, LoxoneStateProcessor>();
             services.AddTransient<ICommandInvoker, CommandInvoker>();
+            services.AddScoped(typeof(CancellationToken), serviceProvider => CancellationToken.None);
 
             return services;
         }

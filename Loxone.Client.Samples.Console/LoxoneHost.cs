@@ -92,7 +92,7 @@ namespace Loxone.Client.Samples.Console
             //_logger.LogInformation("Press enter list all available moods and the active moods of 'RGB legplanken zitkamer'");
             _logger.LogInformation("Press enter to switch dining room light on/off");
             Console.ReadLine();
-            var invoker = new CommandInvoker(_service.MiniserverConnection, cancellationToken);
+            var invoker = new CommandInvoker(_service.MiniserverConnection);
 
             var diningRoomLight = _service.StructureFile.Controls.FirstOrDefault(c => c is DimmerControl && c.RoomName == "Eetkamer") as DimmerControl;
             await diningRoomLight.OffAsync(_service.MiniserverConnection);
@@ -105,7 +105,7 @@ namespace Loxone.Client.Samples.Console
             var c = new SetVirtualTextInputCommand("OfficeLastReadingDate", DateTimeOffset.Now.ToString("dd/MM/yyyy HH:mm:ss"));
             
             invoker.Command = c;
-            await invoker.ExecuteAsync();
+            await invoker.ExecuteAsync(CancellationToken.None);
 
             _logger.LogInformation("Switching on/off first light switch");
             var lightController = _service.StructureFile.Controls.FirstOrDefault(c => c is LightControllerV2Control && c.Name == "RGB legplanken zitkamer") as LightControllerV2Control;
@@ -137,14 +137,14 @@ namespace Loxone.Client.Samples.Console
 
         public async Task ExecuteAsync(IMiniserverConnection connection, CancellationToken cancellationToken)
         {
-            var invoker = new CommandInvoker(connection, cancellationToken);
+            var invoker = new CommandInvoker(connection);
             var value = false;
             while (true)
             {
                 var valueText = value ? "1" : "0";
                 var command = new SetVirtualTextInputCommand("FileServerActive", valueText);
                 invoker.Command = command;
-                await invoker.ExecuteAsync();
+                await invoker.ExecuteAsync(cancellationToken);
 
                 value = !value;
                 Thread.Sleep(5000);
